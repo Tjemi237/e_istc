@@ -1,0 +1,1392 @@
+{% extends "base.html" %}
+
+{% block title %}Détails du Cours - {{ course.title }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb bg-light p-3 rounded">
+            <li class="breadcrumb-item">
+                {% if request.user.is_enseignant %}
+                    <a href="{% url 'users:enseignant_dashboard' %}">Mon Tableau de Bord</a>
+                {% else %}
+                    <a href="{% url 'administration:course_management' %}">Gestion des Cours</a>
+                {% endif %}
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">{{ course.title }}</li>
+        </ol>
+    </nav>
+
+    <!-- Course Header -->
+    <div class="card shadow-sm mb-4 border-0">
+        <div class="card-body">
+            <h2 class="card-title mb-3">{{ course.title }}</h2>
+            <p class="text-muted">{{ course.description }}</p>
+        </div>
+    </div>
+
+    <!-- Tabs Navigation -->
+    <ul class="nav nav-tabs mb-4" id="courseTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="modules-tab" data-bs-toggle="tab" data-bs-target="#modules" type="button" role="tab" aria-controls="modules" aria-selected="true">Modules</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="annonces-tab" data-bs-toggle="tab" data-bs-target="#annonces" type="button" role="tab" aria-controls="annonces" aria-selected="false">Annonces</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="evaluations-tab" data-bs-toggle="tab" data-bs-target="#evaluations" type="button" role="tab" aria-controls="evaluations" aria-selected="false">Évaluations</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="students-tab" data-bs-toggle="tab" data-bs-target="#students" type="button" role="tab" aria-controls="students" aria-selected="false">Étudiants</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="forum-tab" data-bs-toggle="tab" data-bs-target="#forum" type="button" role="tab" aria-controls="forum" aria-selected="false">Forum</button>
+        </li>
+    </ul>
+
+    <div class="row g-4">
+        <!-- Main Content -->
+        <div class="col-lg-8">
+            <div class="tab-content" id="courseTabsContent">
+                <!-- Modules Tab -->
+                <div class="tab-pane fade show active" id="modules" role="tabpanel" aria-labelledby="modules-tab">
+                    <div class="card shadow-sm border-0">
+                        <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">Modules</h5>
+                            <button id="addModuleBtn" class="btn btn-primary btn-sm" aria-label="Ajouter un module"><i class="bi bi-plus-circle"></i></button>
+                        </div>
+                        <div class="card-body">
+                            <ul class="list-group list-group-flush" id="module-list">
+                                {% for module in course.modules.all %}
+                                <li class="list-group-item border-0 py-3" id="module-item-{{ module.id }}">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="mb-1">{{ module.title }} <span class="text-muted">(Ordre: {{ module.order }})</span></h6>
+                                            <p class="text-muted mb-2">{{ module.description }}</p>
+                                        </div>
+                                        <div>
+                                            <button class="btn btn-outline-secondary btn-sm edit-module-btn me-1" data-id="{{ module.id }}" aria-label="Modifier le module"><i class="bi bi-pencil"></i></button>
+                                            <button class="btn btn-outline-danger btn-sm delete-module-btn" data-id="{{ module.id }}" aria-label="Supprimer le module"><i class="bi bi-trash"></i></button>
+                                        </div>
+                                    </div>
+                                    <h6 class="mt-3 mb-2">Ressources</h6>
+                                    <ul class="list-group list-group-flush ms-3" id="ressource-list-{{ module.id }}">
+                                        {% for ressource in module.ressources.all %}
+                                        <li class="list-group-item border-0 py-2 d-flex justify-content-between align-items-center" id="ressource-item-{{ ressource.id }}">
+                                            <span>{{ ressource.title }}</span>
+                                            <div>
+                                                {% if ressource.file %}
+                                                    <a href="{{ ressource.file.url }}" target="_blank" class="btn btn-outline-info btn-sm me-1" aria-label="Voir le fichier"><i class="bi bi-file-earmark"></i></a>
+                                                {% endif %}
+                                                {% if ressource.url %}
+                                                    <a href="{{ ressource.url }}" target="_blank" class="btn btn-outline-info btn-sm me-1" aria-label="Voir l'URL"><i class="bi bi-link-45deg"></i></a>
+                                                {% endif %}
+                                                <button class="btn btn-outline-secondary btn-sm edit-ressource-btn me-1" data-id="{{ ressource.id }}" data-module-id="{{ module.id }}" aria-label="Modifier la ressource"><i class="bi bi-pencil"></i></button>
+                                                <button class="btn btn-outline-danger btn-sm delete-ressource-btn" data-id="{{ ressource.id }}" aria-label="Supprimer la ressource"><i class="bi bi-trash"></i></button>
+                                            </div>
+                                        </li>
+                                        {% empty %}
+                                        <li class="list-group-item text-muted">Aucune ressource disponible.</li>
+                                        {% endfor %}
+                                    </ul>
+                                    <button class="btn btn-outline-success btn-sm mt-3 add-ressource-btn" data-module-id="{{ module.id }}" aria-label="Ajouter une ressource"><i class="bi bi-plus-circle"></i></button>
+                                </li>
+                                {% empty %}
+                                <li class="list-group-item text-muted">Aucun module pour ce cours.</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Announcements Tab -->
+                <div class="tab-pane fade" id="annonces" role="tabpanel" aria-labelledby="annonces-tab">
+                    <div class="card shadow-sm border-0">
+                        <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">Annonces</h5>
+                            <button id="addAnnonceBtn" class="btn btn-primary btn-sm" aria-label="Ajouter une annonce"><i class="bi bi-plus-circle"></i></button>
+                        </div>
+                        <div class="card-body">
+                            <ul class="list-group list-group-flush" id="annonce-list">
+                                {% for annonce in annonces %}
+                                <li class="list-group-item border-0 py-3" id="annonce-item-{{ annonce.id }}">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div>
+                                            <h6 class="mb-1">{{ annonce.titre }}</h6>
+                                            <p class="text-muted mb-1">{{ annonce.contenu|linebreaksbr }}</p>
+                                            <small class="text-muted">Publié le: {{ annonce.cree_le|date:"d/m/Y H:i" }}</small>
+                                        </div>
+                                        <div>
+                                            <button class="btn btn-outline-secondary btn-sm edit-annonce-btn me-1" data-id="{{ annonce.id }}" aria-label="Modifier l'annonce"><i class="bi bi-pencil"></i></button>
+                                            <button class="btn btn-outline-danger btn-sm delete-annonce-btn" data-id="{{ annonce.id }}" aria-label="Supprimer l'annonce"><i class="bi bi-trash"></i></button>
+                                        </div>
+                                    </div>
+                                </li>
+                                {% empty %}
+                                <li class="list-group-item text-muted">Aucune annonce pour ce cours.</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Evaluations Tab -->
+                <div class="tab-pane fade" id="evaluations" role="tabpanel" aria-labelledby="evaluations-tab">
+                    <div class="card shadow-sm border-0">
+                        <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">Évaluations</h5>
+                            <button id="addEvaluationBtn" class="btn btn-primary btn-sm" aria-label="Ajouter une évaluation"><i class="bi bi-plus-circle"></i></button>
+                        </div>
+                        <div class="card-body" id="evaluation-list">
+                            <!-- Devoirs Section -->
+                            <h6 class="mb-3 text-primary"><i class="bi bi-file-earmark-text me-2"></i>Devoirs</h6>
+                            <div class="list-group mb-4">
+                                {% for activite in activites %}
+                                    {% if activite.activity_type == 'DEVOIR' %}
+                                        <li class="list-group-item border-0 py-3" id="evaluation-item-{{ activite.id }}">
+                                            <h6 class="mb-1">{{ activite.title }}</h6>
+                                            <p class="text-muted mb-1">{{ activite.description }}</p>
+                                            <small class="text-muted">Date limite: {{ activite.due_date|date:"d/m/Y H:i" }}</small>
+                                            <div class="mt-2 d-flex gap-2">
+                                                <button class="btn btn-outline-warning btn-sm grade-assignment-btn" data-id="{{ activite.id }}" aria-label="Noter les devoirs"><i class="bi bi-pencil-square"></i></button>
+                                                <button class="btn btn-outline-secondary btn-sm edit-evaluation-btn" data-id="{{ activite.id }}" aria-label="Modifier l'évaluation"><i class="bi bi-pencil"></i></button>
+                                                <button class="btn btn-outline-danger btn-sm delete-evaluation-btn" data-id="{{ activite.id }}" aria-label="Supprimer l'évaluation"><i class="bi bi-trash"></i></button>
+                                            </div>
+                                        </li>
+                                    {% endif %}
+                                {% empty %}
+                                    <p class="list-group-item text-muted">Aucun devoir pour ce cours.</p>
+                                {% endfor %}
+                            </div>
+
+                            <!-- Quiz Section -->
+                            <h6 class="mb-3 text-primary"><i class="bi bi-patch-question me-2"></i>Quiz</h6>
+                            <div class="list-group mb-4">
+                                {% for activite in activites %}
+                                    {% if activite.activity_type == 'QUIZ' %}
+                                        <li class="list-group-item border-0 py-3" id="evaluation-item-{{ activite.id }}">
+                                            <h6 class="mb-1">{{ activite.title }}</h6>
+                                            <p class="text-muted mb-1">{{ activite.description }}</p>
+                                            <small class="text-muted">Date limite: {{ activite.due_date|date:"d/m/Y H:i" }}</small>
+                                            <div class="mt-2 d-flex gap-2">
+                                                <button class="btn btn-outline-info btn-sm manage-questions-btn" data-id="{{ activite.id }}" aria-label="Gérer les questions"><i class="bi bi-question-circle"></i></button>
+                                                <button class="btn btn-outline-secondary btn-sm edit-evaluation-btn" data-id="{{ activite.id }}" aria-label="Modifier l'évaluation"><i class="bi bi-pencil"></i></button>
+                                                <button class="btn btn-outline-danger btn-sm delete-evaluation-btn" data-id="{{ activite.id }}" aria-label="Supprimer l'évaluation"><i class="bi bi-trash"></i></button>
+                                            </div>
+                                        </li>
+                                    {% endif %}
+                                {% empty %}
+                                    <p class="list-group-item text-muted">Aucun quiz pour ce cours.</p>
+                                {% endfor %}
+                            </div>
+
+                            <!-- Sondages Section -->
+                            <h6 class="mb-3 text-primary"><i class="bi bi-bar-chart-steps me-2"></i>Sondages</h6>
+                            <div class="list-group">
+                                {% for activite in activites %}
+                                    {% if activite.activity_type == 'SONDAGE' %}
+                                        <li class="list-group-item border-0 py-3" id="evaluation-item-{{ activite.id }}">
+                                            <h6 class="mb-1">{{ activite.title }}</h6>
+                                            <p class="text-muted mb-1">{{ activite.description }}</p>
+                                            <small class="text-muted">Date limite: {{ activite.due_date|date:"d/m/Y H:i" }}</small>
+                                            <div class="mt-2 d-flex gap-2">
+                                                <button class="btn btn-outline-info btn-sm manage-sondage-questions-btn" data-id="{{ activite.id }}" aria-label="Gérer les questions du sondage"><i class="bi bi-question-circle"></i></button>
+                                                <a href="{% url 'evaluations:sondage_results' activite.id %}" class="btn btn-outline-success btn-sm" aria-label="Voir les résultats"><i class="bi bi-bar-chart"></i></a>
+                                                <button class="btn btn-outline-secondary btn-sm edit-evaluation-btn" data-id="{{ activite.id }}" aria-label="Modifier l'évaluation"><i class="bi bi-pencil"></i></button>
+                                                <button class="btn btn-outline-danger btn-sm delete-evaluation-btn" data-id="{{ activite.id }}" aria-label="Supprimer l'évaluation"><i class="bi bi-trash"></i></button>
+                                            </div>
+                                        </li>
+                                    {% endif %}
+                                {% empty %}
+                                    <p class="list-group-item text-muted">Aucun sondage pour ce cours.</p>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Students Tab -->
+                <div class="tab-pane fade" id="students" role="tabpanel" aria-labelledby="students-tab">
+                    <div class="card shadow-sm border-0">
+                        <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">Étudiants inscrits</h5>
+                            <div class="d-flex gap-2">
+                                <button id="enrollStudentBtn" class="btn btn-primary btn-sm" aria-label="Inscrire un étudiant"><i class="bi bi-person-plus"></i></button>
+                                <a href="{% url 'administration:course_progress' course.id %}" class="btn btn-info btn-sm" aria-label="Voir la progression"><i class="bi bi-graph-up"></i></a>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Nom</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="student-table-body">
+                                    {% for student in enrolled_students %}
+                                    <tr id="student-row-{{ student.id }}">
+                                        <td>{{ student.last_name }} {{ student.first_name }}</td>
+                                        <td>
+                                            <a href="{% url 'messaging:new_conversation' student.id %}" class="btn btn-outline-primary btn-sm me-1" aria-label="Contacter l'étudiant"><i class="bi bi-chat-dots"></i></a>
+                                            <button class="btn btn-outline-danger btn-sm remove-student-btn" data-id="{{ student.id }}" aria-label="Retirer l'étudiant"><i class="bi bi-person-dash"></i></button>
+                                        </td>
+                                    </tr>
+                                    {% empty %}
+                                    <tr id="no-student-row">
+                                        <td colspan="2" class="text-muted">Aucun étudiant inscrit.</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Forum Tab -->
+                <div class="tab-pane fade" id="forum" role="tabpanel" aria-labelledby="forum-tab">
+                    <div class="card shadow-sm border-0">
+                        <div class="card-header bg-white border-bottom py-3">
+                            <h5 class="mb-0">Forum</h5>
+                        </div>
+                        <div class="card-body">
+                            <p class="text-muted mb-3">Accéder à l'espace de discussion du cours.</p>
+                            <a href="{% url 'forums:forum_cours' course.id %}" class="btn btn-primary btn-sm" aria-label="Accéder au forum"><i class="bi bi-chat-left-text"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white border-bottom py-3">
+                    <h5 class="mb-0">Informations</h5>
+                </div>
+                <div class="card-body">
+                    <p class="mb-2"><strong>Enseignant:</strong> {{ course.teacher.first_name }} {{ course.teacher.last_name }}</p>
+                    <p class="mb-2"><strong>Création:</strong> {{ course.created_at|date:"d/m/Y H:i" }}</p>
+                    <p class="mb-2"><strong>Mise à jour:</strong> {{ course.updated_at|date:"d/m/Y H:i" }}</p>
+                    <p class="mb-2"><strong>Visioconférence:</strong> {{ course.visio_link|default:"Non défini" }}</p>
+                    <p class="mb-0"><strong>Date visio:</strong> {{ course.visio_date|date:"d/m/Y H:i"|default:"Non défini" }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    {% include "administration/course_detail_modals.html" %}
+</div>
+
+<style>
+    .card {
+        border-radius: 0.5rem;
+    }
+    .nav-tabs .nav-link {
+        border-radius: 0.5rem 0.5rem 0 0;
+    }
+    .nav-tabs .nav-link.active {
+        background-color: #007bff;
+        color: white;
+    }
+    .list-group-item {
+        transition: background-color 0.2s;
+    }
+    .list-group-item:hover {
+        background-color: #f8f9fa;
+    }
+    .btn-sm {
+        padding: 0.25rem 0.5rem;
+    }
+    .table-hover tbody tr:hover {
+        background-color: #f1f3f5;
+    }
+</style>
+
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    console.log('Script course_detail_page.html chargé.');
+    const courseId = "{{ course.id }}";
+    const moduleModal = document.getElementById('moduleModal') ? new bootstrap.Modal(document.getElementById('moduleModal')) : null;
+    const ressourceModal = document.getElementById('ressourceModal') ? new bootstrap.Modal(document.getElementById('ressourceModal')) : null;
+    const deleteConfirmModal = document.getElementById('deleteConfirmModal') ? new bootstrap.Modal(document.getElementById('deleteConfirmModal')) : null;
+    const evaluationModal = document.getElementById('evaluationModal') ? new bootstrap.Modal(document.getElementById('evaluationModal')) : null;
+    const questionsModal = document.getElementById('questionsModal') ? new bootstrap.Modal(document.getElementById('questionsModal')) : null;
+    const gradeAssignmentModal = document.getElementById('gradeAssignmentModal') ? new bootstrap.Modal(document.getElementById('gradeAssignmentModal')) : null;
+    const annonceModal = document.getElementById('annonceModal') ? new bootstrap.Modal(document.getElementById('annonceModal')) : null;
+    const enrollStudentModal = document.getElementById('enrollStudentModal') ? new bootstrap.Modal(document.getElementById('enrollStudentModal')) : null;
+    const sondageQuestionsModal = document.getElementById('sondageQuestionsModal') ? new bootstrap.Modal(document.getElementById('sondageQuestionsModal')) : null;
+
+    const moduleForm = document.getElementById('moduleForm');
+    const ressourceForm = document.getElementById('ressourceForm');
+    const evaluationForm = document.getElementById('evaluationForm');
+    const annonceForm = document.getElementById('annonceForm');
+
+    const addModuleBtn = document.getElementById('addModuleBtn');
+    const saveModuleBtn = document.getElementById('saveModuleBtn');
+    const saveRessourceBtn = document.getElementById('saveRessourceBtn');
+    const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+    const addEvaluationBtn = document.getElementById('addEvaluationBtn');
+    const saveEvaluationBtn = document.getElementById('saveEvaluationBtn');
+    const addAnnonceBtn = document.getElementById('addAnnonceBtn');
+    const saveAnnonceBtn = document.getElementById('saveAnnonceBtn');
+    const enrollStudentBtn = document.getElementById('enrollStudentBtn');
+
+    const moduleList = document.getElementById('module-list');
+    const studentTableBody = document.getElementById('student-table-body');
+    const evaluationList = document.getElementById('evaluation-list');
+    const annonceList = document.getElementById('annonce-list');
+
+    let currentModuleId = null;
+    let currentRessourceId = null;
+    let currentEvaluationId = null;
+    let currentAnnonceId = null;
+    let deleteElementType = null; // 'module', 'ressource', 'evaluation' ou 'annonce'
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    const csrftoken = getCookie('csrftoken');
+
+    // --- Gestion des Évaluations ---
+    addEvaluationBtn.addEventListener('click', function () {
+        currentEvaluationId = null;
+        evaluationForm.reset();
+        document.getElementById('evaluationModalLabel').textContent = 'Ajouter une évaluation';
+        document.getElementById('evaluation-form-errors').classList.add('d-none');
+        evaluationModal.show();
+    });
+
+    saveEvaluationBtn.addEventListener('click', function () {
+        // Client-side validation
+        if (!evaluationForm.checkValidity()) {
+            evaluationForm.reportValidity();
+            return;
+        }
+
+        const spinner = saveEvaluationBtn.querySelector('.spinner-border');
+        spinner.classList.remove('d-none');
+        saveEvaluationBtn.disabled = true;
+
+        const formData = new FormData(evaluationForm);
+        const data = Object.fromEntries(formData.entries());
+        const url = currentEvaluationId
+            ? `/evaluations/api/activities/${currentEvaluationId}/update/`
+            : `/evaluations/api/courses/${courseId}/activities/create/`;
+
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrftoken
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(err => Promise.reject(err));
+            }
+            return response.json();
+        })
+        .then(result => {
+            evaluationModal.hide();
+            upsertEvaluationInList(result.activite);
+            showToast(result.message, 'success');
+        })
+        .catch(error => {
+            const errorDiv = document.getElementById('evaluation-form-errors');
+            errorDiv.innerHTML = Object.values(error.errors || {detail: error.message}).map(e => `<p>${e}</p>`).join('');
+            errorDiv.classList.remove('d-none');
+            showToast(error.message || 'Une erreur est survenue.', 'error');
+        })
+    });
+
+    function upsertEvaluationInList(activite) {
+        let evaluationItem = document.getElementById(`evaluation-item-${activite.id}`);
+        const evaluationHtml = `
+            <div>
+                <h5>${activite.title} <span class="badge bg-info">${activite.activity_type}</span></h5>
+                <p>${activite.description}</p>
+                <small>Date limite: ${new Date(activite.due_date).toLocaleString()}</small>
+            </div>
+            <div>
+                ${activite.activity_type === 'Quiz' ? `<button class="btn btn-sm btn-outline-info manage-questions-btn" data-id="${activite.id}" aria-label="Gérer les questions"><i class="bi bi-question-circle"></i></button>` : ''}
+                ${activite.activity_type === 'Devoir' ? `<button class="btn btn-sm btn-outline-warning grade-assignment-btn" data-id="${activite.id}" aria-label="Noter les devoirs"><i class="bi bi-pencil-square"></i></button>` : ''}
+                <button class="btn btn-sm btn-outline-secondary edit-evaluation-btn" data-id="${activite.id}" aria-label="Modifier l'évaluation"><i class="bi bi-pencil"></i></button>
+                <button class="btn btn-sm btn-outline-danger delete-evaluation-btn" data-id="${activite.id}" aria-label="Supprimer l'évaluation"><i class="bi bi-trash"></i></button>
+            </div>
+        `;
+
+        if (evaluationItem) {
+            evaluationItem.innerHTML = evaluationHtml;
+        } else {
+            evaluationItem = document.createElement('li');
+            evaluationItem.className = 'list-group-item d-flex justify-content-between align-items-center';
+            evaluationItem.id = `evaluation-item-${activite.id}`;
+            evaluationItem.innerHTML = evaluationHtml;
+            evaluationList.appendChild(evaluationItem);
+        }
+    }
+
+    evaluationList.addEventListener('click', function (e) {
+        const target = e.target.closest('button');
+        if (target && target.classList.contains('edit-evaluation-btn')) {
+            const clickedButton = target;
+            const originalButtonText = clickedButton.innerHTML;
+            clickedButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
+            clickedButton.disabled = true;
+
+            currentEvaluationId = target.dataset.id;
+            fetch(`/evaluations/api/activities/${currentEvaluationId}/`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        // Django messages will handle the error display
+                        return;
+                    }
+                    evaluationForm.reset();
+                    document.getElementById('evaluationModalLabel').textContent = 'Modifier une évaluation';
+                    document.getElementById('evaluation-form-errors').classList.add('d-none');
+                    
+                    document.getElementById('evaluationId').value = data.id;
+                    document.getElementById('evaluationTitle').value = data.title;
+                    document.getElementById('evaluationDescription').value = data.description;
+                    document.getElementById('evaluationType').value = data.activity_type;
+                    document.getElementById('evaluationDueDate').value = data.due_date ? new Date(data.due_date).toISOString().slice(0, 16) : '';
+                    
+                    evaluationModal.show();
+                })
+                .finally(() => {
+                    clickedButton.innerHTML = originalButtonText;
+                    clickedButton.disabled = false;
+                });
+        }
+        if (target && target.classList.contains('delete-evaluation-btn')) {
+            currentEvaluationId = target.dataset.id;
+            deleteElementType = 'evaluation';
+            deleteConfirmModal.show();
+        }
+    });
+
+    evaluationList.addEventListener('click', function(e) {
+        const target = e.target.closest('button');
+        if (target && target.classList.contains('manage-questions-btn')) {
+            const quizId = target.dataset.id;
+            document.getElementById('quizId').value = quizId;
+            loadQuestionsForQuiz(quizId);
+            questionsModal.show();
+        }
+        if (target && target.classList.contains('grade-assignment-btn')) {
+            const clickedButton = target;
+            const originalButtonText = clickedButton.innerHTML;
+            clickedButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
+            clickedButton.disabled = true;
+
+            const assignmentId = target.dataset.id;
+            const assignmentTitleElement = document.getElementById('assignmentTitleForGrading');
+            if (assignmentTitleElement) {
+                assignmentTitleElement.textContent = target.closest('li').querySelector('h6').textContent;
+            } else {
+                console.error('Element with ID "assignmentTitleForGrading" not found.');
+                showToast('Erreur: L\'élément de titre du devoir n\'a pas été trouvé.', 'error');
+            }
+            loadSubmissionsForGrading(assignmentId);
+            gradeAssignmentModal.show();
+
+            // Re-enable button after modal is shown (or after an async operation if there was one)
+            clickedButton.innerHTML = originalButtonText;
+            clickedButton.disabled = false;
+        }
+        if (target && target.classList.contains('manage-sondage-questions-btn')) {
+            const sondageId = target.dataset.id;
+            document.getElementById('sondageActivityId').value = sondageId;
+            loadSondageQuestions(sondageId);
+            sondageQuestionsModal.show();
+        }
+    });
+
+    // --- Fonctions d'aide pour la mise à jour de l'UI ---
+    function upsertModuleInList(module) {
+        let moduleItem = document.getElementById(`module-item-${module.id}`);
+
+        if (moduleItem) {
+            // If module exists, only update the parts that can change to preserve the resources list
+            const titleElement = moduleItem.querySelector('h6.mb-1');
+            if (titleElement) {
+                titleElement.innerHTML = `${module.title} <span class="text-muted">(Ordre: ${module.order})</span>`;
+            }
+            const descriptionElement = moduleItem.querySelector('p.text-muted');
+            if (descriptionElement) {
+                descriptionElement.textContent = module.description;
+            }
+        } else {
+            // If module is new, create the full item
+            const newModuleHtml = `
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="mb-1">${module.title} <span class="text-muted">(Ordre: ${module.order})</span></h6>
+                        <p class="text-muted mb-2">${module.description}</p>
+                    </div>
+                    <div>
+                        <button class="btn btn-outline-secondary btn-sm edit-module-btn me-1" data-id="${module.id}" aria-label="Modifier le module"><i class="bi bi-pencil"></i></button>
+                        <button class="btn btn-outline-danger btn-sm delete-module-btn" data-id="${module.id}" aria-label="Supprimer le module"><i class="bi bi-trash"></i></button>
+                    </div>
+                </div>
+                <h6 class="mt-3 mb-2">Ressources</h6>
+                <ul class="list-group list-group-flush ms-3" id="ressource-list-${module.id}">
+                    <li class="list-group-item text-muted">Aucune ressource disponible.</li>
+                </ul>
+                <button class="btn btn-outline-success btn-sm mt-3 add-ressource-btn" data-module-id="${module.id}" aria-label="Ajouter une ressource"><i class="bi bi-plus-circle"></i></button>
+            `;
+            
+            moduleItem = document.createElement('li');
+            moduleItem.className = 'list-group-item border-0 py-3';
+            moduleItem.id = `module-item-${module.id}`;
+            moduleItem.innerHTML = newModuleHtml;
+
+            // Remove the "Aucun module" message if it exists
+            const noModuleLi = document.querySelector('#module-list > li.text-muted');
+            if (noModuleLi) {
+                noModuleLi.remove();
+            }
+            
+            moduleList.appendChild(moduleItem);
+        }
+    }
+
+    function upsertRessourceInList(ressource, moduleId) {
+        const ressourceList = document.getElementById(`ressource-list-${moduleId}`);
+        let ressourceItem = document.getElementById(`ressource-item-${ressource.id}`);
+        const ressourceHtml = `
+            ${ressource.title}
+            <div>
+                ${ressource.file_url ? `<a href="${ressource.file_url}" target="_blank" class="btn btn-sm btn-outline-info" aria-label="Voir Fichier"><i class="bi bi-file-earmark"></i></a>` : ''}
+                ${ressource.url ? `<a href="${ressource.url}" target="_blank" class="btn btn-sm btn-outline-info" aria-label="Voir URL"><i class="bi bi-link-45deg"></i></a>` : ''}
+                <button class="btn btn-sm btn-outline-secondary edit-ressource-btn" data-id="${ressource.id}" data-module-id="${moduleId}" aria-label="Modifier la ressource"><i class="bi bi-pencil"></i></button>
+                <button class="btn btn-sm btn-outline-danger delete-ressource-btn" data-id="${ressource.id}" aria-label="Supprimer la ressource"><i class="bi bi-trash"></i></button>
+            </div>
+        `;
+
+        if (ressourceItem) {
+            ressourceItem.innerHTML = ressourceHtml;
+        } else {
+            ressourceItem = document.createElement('li');
+            ressourceItem.className = 'list-group-item d-flex justify-content-between align-items-center';
+            ressourceItem.id = `ressource-item-${ressource.id}`;
+            ressourceItem.innerHTML = ressourceHtml;
+            ressourceList.appendChild(ressourceItem);
+        }
+    }
+
+    // --- Gestion des Modules ---
+    addModuleBtn.addEventListener('click', function () {
+        currentModuleId = null;
+        moduleForm.reset();
+        document.getElementById('moduleModalLabel').textContent = 'Ajouter un module';
+        document.getElementById('module-form-errors').classList.add('d-none');
+        moduleModal.show();
+    });
+
+    saveModuleBtn.addEventListener('click', function () {
+        // Client-side validation
+        if (!moduleForm.checkValidity()) {
+            moduleForm.reportValidity();
+            return;
+        }
+
+        const spinner = saveModuleBtn.querySelector('.spinner-border');
+        spinner.classList.remove('d-none');
+        saveModuleBtn.disabled = true;
+
+        const formData = new FormData(moduleForm);
+        const data = Object.fromEntries(formData.entries());
+        const url = currentModuleId 
+            ? `/courses/api/modules/${currentModuleId}/update/` 
+            : `/courses/api/courses/${courseId}/modules/create/`;
+        
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrftoken
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(err => Promise.reject(err));
+            }
+            return response.json();
+        })
+        .then(result => {
+            moduleModal.hide();
+            upsertModuleInList(result.module);
+            showToast('Module sauvegardé avec succès.', 'success');
+        })
+        .catch(error => {
+            const errorDiv = document.getElementById('module-form-errors');
+            errorDiv.innerHTML = Object.values(error.errors || {detail: 'Une erreur est survenue.'}).map(e => `<p>${e}</p>`).join('');
+            errorDiv.classList.remove('d-none');
+            showToast('Erreur lors de la sauvegarde du module.', 'error');
+        })
+        .finally(() => {
+            spinner.classList.add('d-none');
+            saveModuleBtn.disabled = false;
+        });
+    });
+
+    moduleList.addEventListener('click', function (e) {
+        const target = e.target.closest('button');
+        if (target && target.classList.contains('edit-module-btn')) {
+            const clickedButton = target;
+            const originalButtonText = clickedButton.innerHTML;
+            clickedButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
+            clickedButton.disabled = true;
+
+            currentModuleId = target.dataset.id;
+            fetch(`/courses/api/modules/${currentModuleId}/`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        // Django messages will handle the error display
+                        return;
+                    }
+                    moduleForm.reset();
+                    document.getElementById('moduleModalLabel').textContent = 'Modifier un module';
+                    document.getElementById('module-form-errors').classList.add('d-none');
+                    
+                    document.getElementById('moduleId').value = data.id;
+                    document.getElementById('moduleTitle').value = data.title;
+                    document.getElementById('moduleDescription').value = data.description;
+                    document.getElementById('moduleOrder').value = data.order;
+                    
+                    moduleModal.show();
+                })
+                .finally(() => {
+                    clickedButton.innerHTML = originalButtonText;
+                    clickedButton.disabled = false;
+                });
+        }
+        if (target && target.classList.contains('delete-module-btn')) {
+            currentModuleId = target.dataset.id;
+            deleteElementType = 'module';
+            deleteConfirmModal.show();
+        }
+    });
+
+    // --- Gestion des Ressources ---
+    moduleList.addEventListener('click', function (e) {
+        const target = e.target.closest('button');
+        if (target && target.classList.contains('add-ressource-btn')) {
+            currentModuleId = target.dataset.moduleId;
+            currentRessourceId = null;
+            ressourceForm.reset();
+            document.getElementById('ressourceModalLabel').textContent = 'Ajouter une ressource';
+            document.getElementById('ressource-form-errors').classList.add('d-none');
+            document.getElementById('ressourceModuleId').value = currentModuleId;
+            ressourceModal.show();
+        }
+        if (target && target.classList.contains('edit-ressource-btn')) {
+            const clickedButton = target;
+            const originalButtonText = clickedButton.innerHTML;
+            clickedButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
+            clickedButton.disabled = true;
+
+            currentRessourceId = target.dataset.id;
+            currentModuleId = target.dataset.moduleId; // Nécessaire pour upsert
+            fetch(`/courses/api/ressources/${currentRessourceId}/`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        // Django messages will handle the error display
+                        return;
+                    }
+                    ressourceForm.reset();
+                    document.getElementById('ressourceModalLabel').textContent = 'Modifier une ressource';
+                    document.getElementById('ressource-form-errors').classList.add('d-none');
+                    
+                    document.getElementById('ressourceId').value = data.id;
+                    document.getElementById('ressourceModuleId').value = currentModuleId;
+                    document.getElementById('ressourceTitle').value = data.title;
+                    // Les champs file et url sont gérés différemment
+                    document.getElementById('ressourceUrl').value = data.url || '';
+                    
+                    ressourceModal.show();
+                })
+                .finally(() => {
+                    clickedButton.innerHTML = originalButtonText;
+                    clickedButton.disabled = false;
+                });
+        }
+        if (target && target.classList.contains('delete-ressource-btn')) {
+            currentRessourceId = target.dataset.id;
+            deleteElementType = 'ressource';
+            deleteConfirmModal.show();
+        }
+    });
+
+    saveRessourceBtn.addEventListener('click', function () {
+        // Client-side validation
+        if (!ressourceForm.checkValidity()) {
+            ressourceForm.reportValidity();
+            return;
+        }
+
+        const spinner = saveRessourceBtn.querySelector('.spinner-border');
+        spinner.classList.remove('d-none');
+        saveRessourceBtn.disabled = true;
+
+        const formData = new FormData(ressourceForm);
+        const url = currentRessourceId 
+            ? `/courses/api/ressources/${currentRessourceId}/update/` 
+            : `/courses/api/modules/${currentModuleId}/ressources/create/`;
+        
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': csrftoken
+            },
+            body: formData // FormData est utilisé directement pour les fichiers
+        })
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(err => Promise.reject(err));
+            }
+            return response.json();
+        })
+        .then(result => {
+            ressourceModal.hide();
+            upsertRessourceInList(result.ressource, currentModuleId);
+            showToast('Ressource sauvegardée avec succès.', 'success');
+        })
+        .catch(error => {
+            const errorDiv = document.getElementById('ressource-form-errors');
+            errorDiv.innerHTML = Object.values(error.errors || {detail: 'Une erreur est survenue.'}).map(e => `<p>${e}</p>`).join('');
+            errorDiv.classList.remove('d-none');
+            showToast('Erreur lors de la sauvegarde de la ressource.', 'error');
+        })
+        .finally(() => {
+            spinner.classList.add('d-none');
+            saveRessourceBtn.disabled = false;
+        });
+    });
+
+    // --- Gestion de la Suppression (Module/Ressource) ---
+    confirmDeleteBtn.addEventListener('click', function() {
+        const spinner = confirmDeleteBtn.querySelector('.spinner-border');
+        spinner.classList.remove('d-none');
+        confirmDeleteBtn.disabled = true;
+
+        let url = '';
+        if (deleteElementType === 'module') {
+            url = `/courses/api/modules/${currentModuleId}/delete/`;
+        } else if (deleteElementType === 'ressource') {
+            url = `/courses/api/ressources/${currentRessourceId}/delete/`;
+        } else if (deleteElementType === 'evaluation') {
+            url = `/evaluations/api/activities/${currentEvaluationId}/delete/`;
+        } else if (deleteElementType === 'annonce') {
+            url = `/courses/api/annonces/${currentAnnonceId}/delete/`;
+        }
+
+        fetch(url, {
+            method: 'POST',
+            headers: { 'X-CSRFToken': csrftoken }
+        })
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(err => Promise.reject(err));
+            }
+            return response.json();
+        })
+        .then(result => {
+            if (deleteElementType === 'module') {
+                document.getElementById(`module-item-${currentModuleId}`).remove();
+            } else if (deleteElementType === 'ressource') {
+                document.getElementById(`ressource-item-${currentRessourceId}`).remove();
+            } else if (deleteElementType === 'evaluation') {
+                document.getElementById(`evaluation-item-${currentEvaluationId}`).remove();
+            } else if (deleteElementType === 'annonce') {
+                document.getElementById(`annonce-item-${currentAnnonceId}`).remove();
+            }
+            deleteConfirmModal.hide();
+            showToast(result.message || 'Élément supprimé avec succès.', 'success');
+        })
+        .catch(error => {
+            showToast(error.message || 'Une erreur est survenue lors de la suppression.', 'error');
+        })
+        .finally(() => {
+            spinner.classList.add('d-none');
+            confirmDeleteBtn.disabled = false;
+        });
+    });
+
+    studentTableBody.addEventListener('click', function (e) {
+        const target = e.target.closest('button');
+        if (target && target.classList.contains('remove-student-btn')) {
+            const studentId = target.dataset.id;
+            // Using native confirm for now, will be replaced by a custom modal later if needed
+            if (confirm('Retirer cet étudiant du cours ?')) {
+                fetch(`/courses/api/courses/{{ course.id }}/students/${studentId}/remove/`, {
+                    method: 'POST',
+                    headers: { 'X-CSRFToken': csrftoken }
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(err => Promise.reject(err));
+                    }
+                    return response.json();
+                })
+                .then(result => {
+                    document.getElementById(`student-row-${studentId}`).remove();
+                    showToast(result.message || 'Étudiant retiré avec succès.', 'success');
+                })
+                .catch(error => {
+                    showToast(error.message || 'Une erreur est survenue.', 'error');
+                });
+            }
+        }
+    });
+
+    // Optionally, add your showToast function here if not already defined
+
+    // --- Gestion des Questions de Quiz ---
+    const questionForm = document.getElementById('questionForm');
+    const choicesContainer = document.getElementById('choices-container');
+    const questionListInModal = document.getElementById('question-list-in-modal');
+
+    function loadQuestionsForQuiz(quizId) {
+        questionListInModal.innerHTML = '<li>Chargement...</li>';
+        fetch(`/evaluations/api/activities/${quizId}/questions/`)
+            .then(response => response.json())
+            .then(data => {
+                questionListInModal.innerHTML = '';
+                if (data.questions && data.questions.length > 0) {
+                    data.questions.forEach(question => {
+                        const questionItem = document.createElement('li');
+                        questionItem.className = 'list-group-item d-flex justify-content-between align-items-center';
+                        questionItem.innerHTML = `
+                            <span>${question.intitule}</span>
+                            <div>
+                                <button class="btn btn-sm btn-secondary edit-question-btn" data-id="${question.id}">Modifier</button>
+                                <button class="btn btn-sm btn-danger delete-question-btn" data-id="${question.id}">Supprimer</button>
+                            </div>
+                        `;
+                        questionListInModal.appendChild(questionItem);
+                    });
+                } else {
+                    questionListInModal.innerHTML = '<li>Aucune question pour ce quiz.</li>';
+                }
+            });
+    }
+
+    document.getElementById('addChoiceBtn').addEventListener('click', function() {
+        const choiceIndex = choicesContainer.children.length;
+        const choiceHtml = `
+            <div class="input-group mb-2">
+                <input type="text" class="form-control" name="choice_text_${choiceIndex}" placeholder="Texte de la réponse" required>
+                <div class="input-group-text">
+                    <input class="form-check-input mt-0" type="checkbox" name="choice_correct_${choiceIndex}">
+                </div>
+                <button type="button" class="btn btn-outline-danger remove-choice-btn">X</button>
+            </div>
+        `;
+        choicesContainer.insertAdjacentHTML('beforeend', choiceHtml);
+    });
+
+    choicesContainer.addEventListener('click', function(e) {
+        if (e.target.classList.contains('remove-choice-btn')) {
+            e.target.closest('.input-group').remove();
+        }
+    });
+
+    questionForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const formData = new FormData(questionForm);
+        const quizId = formData.get('quizId');
+        const questionId = formData.get('questionId');
+        const url = questionId 
+            ? `/evaluations/api/questions/${questionId}/update/`
+            : `/evaluations/api/activities/${quizId}/questions/create/`;
+
+        const data = {
+            intitule: formData.get('intitule'),
+            type_question: formData.get('type_question'),
+            choices: []
+        };
+
+        let i = 0;
+        while(formData.has(`choice_text_${i}`)) {
+            data.choices.push({
+                text: formData.get(`choice_text_${i}`),
+                is_correct: formData.has(`choice_correct_${i}`)
+            });
+            i++;
+        }
+
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrftoken
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(err => Promise.reject(err));
+            }
+            return response.json();
+        })
+        .then(result => {
+            questionForm.reset();
+            choicesContainer.innerHTML = '';
+            document.getElementById('questionId').value = '';
+            loadQuestionsForQuiz(quizId);
+            showToast(result.message || 'Question sauvegardée avec succès.', 'success');
+        })
+        .catch(error => {
+            const errorDiv = document.getElementById('question-form-errors');
+            errorDiv.innerHTML = Object.values(error.errors || {detail: 'Une erreur est survenue.'}).map(e => `<p>${e}</p>`).join('');
+            errorDiv.classList.remove('d-none');
+            showToast('Erreur lors de la sauvegarde de la question.', 'error');
+        });
+    });
+
+    document.getElementById('clearQuestionFormBtn').addEventListener('click', function() {
+        questionForm.reset();
+        choicesContainer.innerHTML = '';
+        document.getElementById('questionId').value = '';
+    });
+
+    questionListInModal.addEventListener('click', function(e) {
+        const target = e.target.closest('button');
+        if (target && target.classList.contains('edit-question-btn')) {
+            const questionId = target.dataset.id;
+            fetch(`/evaluations/api/questions/${questionId}/`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        // Django messages will handle the error display
+                        return;
+                    }
+                    questionForm.reset();
+                    choicesContainer.innerHTML = '';
+                    document.getElementById('questionId').value = data.id;
+                    document.getElementById('questionIntitule').value = data.intitule;
+                    document.getElementById('questionType').value = data.type_question;
+                    data.choix.forEach((choice, index) => {
+                        const choiceHtml = `
+                            <div class="input-group mb-2">
+                                <input type="text" class="form-control" name="choice_text_${index}" value="${choice.texte}" required>
+                                <div class="input-group-text">
+                                    <input class="form-check-input mt-0" type="checkbox" name="choice_correct_${index}" ${choice.est_correct ? 'checked' : ''}>
+                                </div>
+                                <button type="button" class="btn btn-outline-danger remove-choice-btn">X</button>
+                            </div>
+                        `;
+                        choicesContainer.insertAdjacentHTML('beforeend', choiceHtml);
+                    });
+                });
+        }
+        if (target && target.classList.contains('delete-question-btn')) {
+            const questionId = target.dataset.id;
+            if (confirm('Supprimer cette question ?')) {
+                fetch(`/evaluations/api/questions/${questionId}/delete/`, {
+                    method: 'POST',
+                    headers: { 'X-CSRFToken': csrftoken }
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(err => Promise.reject(err));
+                    }
+                    return response.json();
+                })
+                .then(result => {
+                    loadQuestionsForQuiz(document.getElementById('quizId').value);
+                    showToast(result.message || 'Question supprimée avec succès.', 'success');
+                })
+                .catch(error => {
+                    showToast(error.message || 'Une erreur est survenue.', 'error');
+                });
+            }
+        }
+    });
+
+    // --- Gestion de la Notation des Devoirs ---
+    const submissionsList = document.getElementById('submissionsList');
+
+    function loadSubmissionsForGrading(assignmentId) {
+        submissionsList.innerHTML = '<li>Chargement des soumissions...</li>';
+        fetch(`/evaluations/api/activities/${assignmentId}/submissions/`)
+            .then(response => response.json())
+            .then(data => {
+                submissionsList.innerHTML = '';
+                if (data.soumissions && data.soumissions.length > 0) {
+                    data.soumissions.forEach(submission => {
+                        const submissionItem = document.createElement('div');
+                        submissionItem.className = 'card mb-2';
+                        submissionItem.innerHTML = `
+                            <div class="card-body">
+                                <h6 class="card-title">${submission.etudiant_name}</h6>
+                                <p class="card-text">Soumis le: ${new Date(submission.date_soumission).toLocaleString()}</p>
+                                ${submission.file_url ? `<a href="${submission.file_url}" target="_blank" class="btn btn-sm btn-info">Voir le fichier</a>` : ''}
+                                <div class="input-group mt-2">
+                                    <span class="input-group-text">Note</span>
+                                    <input type="number" step="0.1" class="form-control grade-input" data-submission-id="${submission.id}" value="${submission.note !== null ? submission.note : ''}">
+                                    <textarea class="form-control mt-2 comment-input" data-submission-id="${submission.id}" placeholder="Commentaires (optionnel)">${submission.commentaires_enseignant || ''}</textarea>
+                                    <button class="btn btn-primary save-grade-btn" data-submission-id="${submission.id}">
+                                        <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                                        Enregistrer
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                        submissionsList.appendChild(submissionItem);
+                    });
+                } else {
+                    submissionsList.innerHTML = '<p>Aucune soumission pour ce devoir.</p>';
+                }
+            });
+    }
+
+    submissionsList.addEventListener('click', function(e) {
+        const target = e.target.closest('button');
+        if (target && target.classList.contains('save-grade-btn')) {
+            const submissionId = target.dataset.submissionId;
+            const grade = target.previousElementSibling.value;
+            const comment = target.previousElementSibling.previousElementSibling.value;
+
+            fetch(`/evaluations/api/submissions/${submissionId}/grade/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrftoken
+                },
+                body: JSON.stringify({ note: grade, commentaires_enseignant: comment })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(err => Promise.reject(err));
+                }
+                return response.json();
+            })
+            .then(result => {
+                showToast(result.message, 'success');
+            })
+            .catch(error => {
+                showToast(error.message || 'Une erreur est survenue.', 'error');
+            })
+            .finally(() => {
+                spinner.classList.add('d-none');
+                clickedButton.disabled = false;
+            });
+        }
+    });
+
+    // --- Gestion des Sondages ---
+    const sondageQuestionForm = document.getElementById('sondageQuestionForm');
+    const sondageQuestionListInModal = document.getElementById('sondage-question-list-in-modal');
+
+    function loadSondageQuestions(activityId) {
+        sondageQuestionListInModal.innerHTML = '<li>Chargement...</li>';
+        fetch(`/evaluations/api/sondages/${activityId}/questions/`)
+            .then(response => response.json())
+            .then(data => {
+                sondageQuestionListInModal.innerHTML = '';
+                if (data.questions && data.questions.length > 0) {
+                    data.questions.forEach(question => {
+                        const questionItem = document.createElement('li');
+                        questionItem.className = 'list-group-item d-flex justify-content-between align-items-center';
+                        questionItem.innerHTML = `
+                            <span>${question.intitule}</span>
+                            <div>
+                                <button class="btn btn-sm btn-danger delete-sondage-question-btn" data-id="${question.id}">Supprimer</button>
+                            </div>
+                        `;
+                        sondageQuestionListInModal.appendChild(questionItem);
+                    });
+                } else {
+                    sondageQuestionListInModal.innerHTML = '<li>Aucune question pour ce sondage.</li>';
+                }
+            });
+    }
+
+    sondageQuestionForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const formData = new FormData(sondageQuestionForm);
+        const activityId = formData.get('sondageActivityId');
+        const url = `/evaluations/api/sondages/${activityId}/questions/create/`;
+
+        const data = {
+            intitule: formData.get('intitule'),
+        };
+
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrftoken
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(err => Promise.reject(err));
+            }
+            return response.json();
+        })
+        .then(result => {
+            sondageQuestionForm.reset();
+            loadSondageQuestions(activityId);
+            showToast(result.message, 'success');
+        })
+        .catch(error => {
+            const errorDiv = document.getElementById('sondage-question-form-errors');
+            errorDiv.innerHTML = Object.values(error.errors || {detail: error.message}).map(e => `<p>${e}</p>`).join('');
+            errorDiv.classList.remove('d-none');
+            showToast(error.message || 'Une erreur est survenue.', 'error');
+        });
+    });
+
+    sondageQuestionListInModal.addEventListener('click', function(e) {
+        const target = e.target.closest('button');
+        if (target && target.classList.contains('delete-sondage-question-btn')) {
+            const questionId = target.dataset.id;
+            if (confirm('Supprimer cette question de sondage ?')) {
+                fetch(`/evaluations/api/sondages/questions/${questionId}/delete/`, {
+                    method: 'POST',
+                    headers: { 'X-CSRFToken': csrftoken }
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(err => Promise.reject(err));
+                    }
+                    return response.json();
+                })
+                .then(result => {
+                    loadSondageQuestions(document.getElementById('sondageActivityId').value);
+                    showToast(result.message, 'success');
+                })
+                .catch(error => {
+                    showToast(error.message || 'Une erreur est survenue.', 'error');
+                });
+            }
+        }
+    });
+
+    // --- Gestion des Annonces ---
+    addAnnonceBtn.addEventListener('click', function () {
+        currentAnnonceId = null;
+        annonceForm.reset();
+        document.getElementById('annonceModalLabel').textContent = 'Ajouter une annonce';
+        document.getElementById('annonce-form-errors').classList.add('d-none');
+        annonceModal.show();
+    });
+
+    saveAnnonceBtn.addEventListener('click', function () {
+        // Client-side validation
+        if (!annonceForm.checkValidity()) {
+            annonceForm.reportValidity();
+            return;
+        }
+
+        const spinner = saveAnnonceBtn.querySelector('.spinner-border');
+        spinner.classList.remove('d-none');
+        saveAnnonceBtn.disabled = true;
+
+        const formData = new FormData(annonceForm);
+        const data = Object.fromEntries(formData.entries());
+        const url = currentAnnonceId
+            ? `/courses/api/annonces/${currentAnnonceId}/update/`
+            : `/courses/api/courses/${courseId}/annonces/create/`;
+
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrftoken
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(err => Promise.reject(err));
+            }
+            return response.json();
+        })
+        .then(result => {
+            annonceModal.hide();
+            upsertAnnonceInList(result.annonce);
+            showToast(result.message || 'Annonce sauvegardée avec succès.', 'success');
+        })
+        .catch(error => {
+            const errorDiv = document.getElementById('annonce-form-errors');
+            errorDiv.innerHTML = Object.values(error.errors || {detail: 'Une erreur est survenue.'}).map(e => `<p>${e}</p>`).join('');
+            errorDiv.classList.remove('d-none');
+            showToast('Erreur lors de la sauvegarde de l\'annonce.', 'error');
+        })
+        .finally(() => {
+            spinner.classList.add('d-none');
+            saveAnnonceBtn.disabled = false;
+        });
+    });
+
+    function upsertAnnonceInList(annonce) {
+        let annonceItem = document.getElementById(`annonce-item-${annonce.id}`);
+        const annonceHtml = `
+            <div>
+                <h5>${annonce.titre}</h5>
+                <p>${annonce.contenu.replace(/\n/g, '<br>')}</p>
+                <small>Publié le: ${new Date(annonce.cree_le).toLocaleString()}</small>
+            </div>
+            <div>
+                <button class="btn btn-sm btn-outline-secondary edit-annonce-btn" data-id="${annonce.id}" aria-label="Modifier l'annonce"><i class="bi bi-pencil"></i></button>
+                <button class="btn btn-sm btn-outline-danger delete-annonce-btn" data-id="${annonce.id}" aria-label="Supprimer l'annonce"><i class="bi bi-trash"></i></button>
+            </div>
+        `;
+
+        if (annonceItem) {
+            annonceItem.innerHTML = annonceHtml;
+        } else {
+            annonceItem = document.createElement('li');
+            annonceItem.className = 'list-group-item d-flex justify-content-between align-items-center';
+            annonceItem.id = `annonce-item-${annonce.id}`;
+            annonceItem.innerHTML = annonceHtml;
+            annonceList.appendChild(annonceItem);
+        }
+    }
+
+    annonceList.addEventListener('click', function (e) {
+        const target = e.target.closest('button');
+        if (target && target.classList.contains('edit-annonce-btn')) {
+            const clickedButton = target;
+            const originalButtonText = clickedButton.innerHTML;
+            clickedButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
+            clickedButton.disabled = true;
+
+            currentAnnonceId = target.dataset.id;
+            fetch(`/courses/api/annonces/${currentAnnonceId}/`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        // Django messages will handle the error display
+                        return;
+                    }
+                    annonceForm.reset();
+                    document.getElementById('annonceModalLabel').textContent = 'Modifier une annonce';
+                    document.getElementById('annonce-form-errors').classList.add('d-none');
+                    
+                    document.getElementById('annonceId').value = data.id;
+                    document.getElementById('annonceTitre').value = data.titre;
+                    document.getElementById('annonceContenu').value = data.contenu;
+                    
+                    annonceModal.show();
+                })
+                .finally(() => {
+                    clickedButton.innerHTML = originalButtonText;
+                    clickedButton.disabled = false;
+                });
+        }
+        if (target && target.classList.contains('delete-annonce-btn')) {
+            currentAnnonceId = target.dataset.id;
+            deleteElementType = 'annonce';
+            deleteConfirmModal.show();
+        }
+    });
+
+    // --- Gestion de l'Inscription Manuelle ---
+    enrollStudentBtn.addEventListener('click', function() {
+        const list = document.getElementById('enrollable-student-list');
+        list.innerHTML = '<li class="list-group-item">Chargement...</li>';
+        enrollStudentModal.show();
+        fetch(`/courses/api/courses/${courseId}/students/enrollable/`)
+            .then(response => response.json())
+            .then(data => {
+                list.innerHTML = '';
+                if (data.students && data.students.length > 0) {
+                    data.students.forEach(student => {
+                        const item = document.createElement('li');
+                        item.className = 'list-group-item d-flex justify-content-between align-items-center';
+                        item.innerHTML = `
+                            <span>${student.name} (${student.matricule})</span>
+                            <button class="btn btn-sm btn-success enroll-now-btn" data-id="${student.id}">Inscrire</button>
+                        `;
+                        list.appendChild(item);
+                    });
+                } else {
+                    list.innerHTML = '<li class="list-group-item">Tous les étudiants sont déjà inscrits.</li>';
+                }
+            });
+    });
+
+    document.getElementById('enrollable-student-list').addEventListener('click', function(e) {
+        const target = e.target.closest('button');
+        if (target && target.classList.contains('enroll-now-btn')) {
+            const clickedButton = target;
+            const originalButtonText = clickedButton.innerHTML;
+            clickedButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
+            clickedButton.disabled = true;
+
+            const studentId = target.dataset.id;
+            fetch(`/courses/api/courses/${courseId}/students/${studentId}/enroll/`, {
+                method: 'POST',
+                headers: { 'X-CSRFToken': csrftoken }
+            })
+            .then(response => {
+            if (!response.ok) {
+                return response.json().then(err => Promise.reject(err));
+            }
+            return response.json();
+        })
+        .then(result => {
+            enrollStudentModal.hide();
+            addStudentToTable(result.student);
+            showToast(result.message, 'success');
+        })
+        .catch(error => {
+            showToast(error.message || 'Une erreur est survenue.', 'error');
+        })
+        .finally(() => {
+            clickedButton.innerHTML = originalButtonText;
+            clickedButton.disabled = false;
+        });
+        }
+    });
+
+    function addStudentToTable(student) {
+        const noStudentRow = document.getElementById('no-student-row');
+        if (noStudentRow) {
+            noStudentRow.remove();
+        }
+        const newRow = document.createElement('tr');
+        newRow.id = `student-row-${student.id}`;
+        newRow.innerHTML = `
+            <td>${student.last_name} ${student.first_name}</td>
+            <td>${student.email}</td>
+            <td>${student.matricule}</td>
+            <td>
+                <button class="btn btn-sm btn-danger remove-student-btn" data-id="${student.id}">Retirer</button>
+            </td>
+        `;
+        studentTableBody.appendChild(newRow);
+    }
+});
+</script>
+{% endblock %}

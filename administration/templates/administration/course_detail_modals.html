@@ -1,0 +1,313 @@
+{% comment %}
+This file contains all the modals used in the course_detail_page.html template.
+{% endcomment %}
+
+<!-- Modal pour Inscrire un Étudiant -->
+<div class="modal fade" id="enrollStudentModal" tabindex="-1" aria-labelledby="enrollStudentModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="enrollStudentModalLabel">Inscrire un Étudiant</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <ul class="list-group" id="enrollable-student-list">
+                    <!-- La liste des étudiants non-inscrits sera chargée ici -->
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal pour Ajouter/Modifier Annonce -->
+<div class="modal fade" id="annonceModal" tabindex="-1" aria-labelledby="annonceModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="annonceModalLabel">Ajouter une annonce</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="annonceForm">
+                    <input type="hidden" id="annonceId" name="annonceId">
+                    <div id="annonce-form-errors" class="alert alert-danger d-none"></div>
+                    
+                    <div class="mb-3">
+                        <label for="annonceTitre" class="form-label">Titre</label>
+                        <input type="text" class="form-control" id="annonceTitre" name="titre" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="annonceContenu" class="form-label">Contenu</label>
+                        <textarea class="form-control" id="annonceContenu" name="contenu" rows="4" required></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <button type="button" id="saveAnnonceBtn" class="btn btn-primary">
+                <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                Sauvegarder
+            </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal pour Ajouter/Modifier Module -->
+<div class="modal fade" id="moduleModal" tabindex="-1" aria-labelledby="moduleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="moduleModalLabel">Ajouter un module</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="moduleForm">
+                    <input type="hidden" id="moduleId" name="moduleId">
+                    <div id="module-form-errors" class="alert alert-danger d-none"></div>
+                    
+                    <div class="mb-3">
+                        <label for="moduleTitle" class="form-label">Titre</label>
+                        <input type="text" class="form-control" id="moduleTitle" name="title" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="moduleDescription" class="form-label">Description</label>
+                        <textarea class="form-control" id="moduleDescription" name="description" rows="3"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="moduleOrder" class="form-label">Ordre</label>
+                        <input type="number" class="form-control" id="moduleOrder" name="order" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <button type="button" id="saveModuleBtn" class="btn btn-primary">
+                <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                Sauvegarder
+            </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal pour Ajouter/Modifier Ressource -->
+<div class="modal fade" id="ressourceModal" tabindex="-1" aria-labelledby="ressourceModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="ressourceModalLabel">Ajouter une ressource</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="ressourceForm" enctype="multipart/form-data">
+                    <input type="hidden" id="ressourceId" name="ressourceId">
+                    <input type="hidden" id="ressourceModuleId" name="ressourceModuleId">
+                    <div id="ressource-form-errors" class="alert alert-danger d-none"></div>
+                    
+                    <div class="mb-3">
+                        <label for="ressourceTitle" class="form-label">Titre</label>
+                        <input type="text" class="form-control" id="ressourceTitle" name="title" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="ressourceFile" class="form-label">Fichier</label>
+                        <input type="file" class="form-control" id="ressourceFile" name="file">
+                    </div>
+                    <div class="mb-3">
+                        <label for="ressourceUrl" class="form-label">URL</label>
+                        <input type="url" class="form-control" id="ressourceUrl" name="url">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <button type="button" id="saveRessourceBtn" class="btn btn-primary">
+                <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                Sauvegarder
+            </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Confirmation de Suppression (Module/Ressource) -->
+<div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirmer la suppression</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Êtes-vous sûr de vouloir supprimer cet élément ? Cette action est irréversible.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <button type="button" id="confirmDeleteBtn" class="btn btn-danger">
+                <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                Supprimer
+            </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal pour Ajouter/Modifier Évaluation -->
+<div class="modal fade" id="evaluationModal" tabindex="-1" aria-labelledby="evaluationModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="evaluationModalLabel">Ajouter une évaluation</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="evaluationForm">
+                    <input type="hidden" id="evaluationId" name="evaluationId">
+                    <div id="evaluation-form-errors" class="alert alert-danger d-none"></div>
+                    
+                    <div class="mb-3">
+                        <label for="evaluationTitle" class="form-label">Titre</label>
+                        <input type="text" class="form-control" id="evaluationTitle" name="title" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="evaluationDescription" class="form-label">Description</label>
+                        <textarea class="form-control" id="evaluationDescription" name="description" rows="3"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="evaluationType" class="form-label">Type</label>
+                        <select class="form-select" id="evaluationType" name="activity_type" required>
+                            <option value="DEVOIR">Devoir</option>
+                            <option value="QUIZ">Quiz</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="evaluationDueDate" class="form-label">Date Limite</label>
+                        <input type="datetime-local" class="form-control" id="evaluationDueDate" name="due_date">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <button type="button" id="saveEvaluationBtn" class="btn btn-primary">
+                <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                Sauvegarder
+            </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal pour Gérer les Questions d'un Quiz -->
+<div class="modal fade" id="questionsModal" tabindex="-1" aria-labelledby="questionsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="questionsModalLabel">Gérer les Questions</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-5">
+                        <h5>Ajouter/Modifier une Question</h5>
+                        <form id="questionForm">
+                            <input type="hidden" id="questionId" name="questionId">
+                            <input type="hidden" id="quizId" name="quizId">
+                            <div id="question-form-errors" class="alert alert-danger d-none"></div>
+                            <div class="mb-3">
+                                <label for="questionIntitule" class="form-label">Intitulé de la question</label>
+                                <textarea class="form-control" id="questionIntitule" name="intitule" rows="3" required></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label for="questionType" class="form-label">Type de question</label>
+                                <select class="form-select" id="questionType" name="type_question">
+                                    <option value="UNIQUE">Choix Unique</option>
+                                    <option value="MULTIPLE">Choix Multiple</option>
+                                </select>
+                            </div>
+                            <hr>
+                            <h6>Choix de réponse</h6>
+                            <div id="choices-container">
+                                <!-- Les choix seront ajoutés ici par JS -->
+                            </div>
+                            <button type="button" id="addChoiceBtn" class="btn btn-sm btn-success mt-2">Ajouter un choix</button>
+                            <div class="mt-3">
+                                <button type="submit" id="saveQuestionBtn" class="btn btn-primary">
+                <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                Sauvegarder la question
+            </button>
+                                <button type="button" id="clearQuestionFormBtn" class="btn btn-secondary">Nouvelle Question</button>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="col-md-7">
+                        <h5>Questions du Quiz</h5>
+                        <ul class="list-group" id="question-list-in-modal">
+                            <!-- La liste des questions sera chargée ici -->
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal pour Gérer les Questions d'un Sondage -->
+<div class="modal fade" id="sondageQuestionsModal" tabindex="-1" aria-labelledby="sondageQuestionsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="sondageQuestionsModalLabel">Gérer les Questions du Sondage</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h5>Ajouter une Question de Sondage</h5>
+                        <form id="sondageQuestionForm">
+                            <input type="hidden" id="sondageActivityId" name="sondageActivityId">
+                            <div id="sondage-question-form-errors" class="alert alert-danger d-none"></div>
+                            <div class="mb-3">
+                                <label for="sondageQuestionIntitule" class="form-label">Intitulé de la question</label>
+                                <textarea class="form-control" id="sondageQuestionIntitule" name="intitule" rows="3" required></textarea>
+                            </div>
+                            <button type="submit" id="saveSondageQuestionBtn" class="btn btn-primary">
+                                <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                                Ajouter la question
+                            </button>
+                        </form>
+                    </div>
+                    <div class="col-md-6">
+                        <h5>Questions du Sondage</h5>
+                        <ul class="list-group" id="sondage-question-list-in-modal">
+                            <!-- La liste des questions sera chargée ici -->
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal pour Noter les Devoirs -->
+<div class="modal fade" id="gradeAssignmentModal" tabindex="-1" aria-labelledby="gradeAssignmentModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="gradeAssignmentModalLabel">Noter les Devoirs</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <h6 id="assignmentTitleForGrading"></h6>
+                <div id="submissionsList">
+                    <!-- Les soumissions seront chargées ici par JS -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+            </div>
+        </div>
+    </div>
+</div>

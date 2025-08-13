@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}Paramètres de la Plateforme{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'home' %}">Accueil</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Paramètres de la Plateforme</li>
+        </ol>
+    </nav>
+
+    <h2 class="mb-4">Paramètres de la Plateforme</h2>
+
+    <div class="card border-0 shadow-sm">
+        <div class="card-body">
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit" class="btn btn-primary" aria-label="Enregistrer"><i class="bi bi-save"></i> Enregistrer</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

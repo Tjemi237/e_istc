@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block title %}Résultats du Quiz{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'home' %}">Accueil</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'users:student_course_detail' activite.course.id %}">Cours: {{ activite.course.title }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Résultats du Quiz</li>
+        </ol>
+    </nav>
+
+    <div class="card">
+        <div class="card-header bg-success text-white">
+            <h2 class="mb-0">Résultats du Quiz : {{ activite.title }}</h2>
+        </div>
+        <div class="card-body">
+            <p class="lead">Votre score : <strong>{{ score }} / {{ total_questions }}</strong></p>
+            <hr>
+            <p>Félicitations pour avoir terminé le quiz !</p>
+            <a href="{% url 'users:student_course_detail' activite.course.id %}" class="btn btn-primary">Retour au cours</a>
+            <a href="{% url 'users:etudiant_dashboard' %}" class="btn btn-secondary">Retour au tableau de bord</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

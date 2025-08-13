@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block title %}Sondage : {{ activite.title }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'users:etudiant_dashboard' %}">Mon Tableau de Bord</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'users:student_course_detail' activite.course.id %}">{{ activite.course.title }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Sondage : {{ activite.title }}</li>
+        </ol>
+    </nav>
+
+    <h2 class="mb-4">Sondage : {{ activite.title }}</h2>
+    <p class="lead">{{ activite.description }}</p>
+
+    <form method="post">
+        {% csrf_token %}
+        {% for question in questions %}
+        <div class="card mb-3 border-0 shadow-sm">
+            <div class="card-header">
+                Question {{ forloop.counter }} : {{ question.intitule }}
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label for="response_{{ question.id }}" class="form-label">Votre réponse :</label>
+                    <textarea class="form-control" id="response_{{ question.id }}" name="question_{{ question.id }}" rows="3" required></textarea>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+        <button type="submit" class="btn btn-primary" aria-label="Soumettre le sondage"><i class="bi bi-send"></i> Soumettre le sondage</button>
+    </form>
+</div>
+{% endblock %}

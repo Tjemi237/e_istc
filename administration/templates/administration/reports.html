@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block title %}Rapports - Administration{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'home' %}">Accueil</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Rapports</li>
+        </ol>
+    </nav>
+
+    <h2 class="mb-4">Rapports de Participation et de Performance</h2>
+
+    <div class="row">
+        <div class="col-md-3">
+            <div class="card text-white bg-primary mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">Utilisateurs Totaux</h5>
+                    <p class="card-text fs-2">{{ total_users }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-success mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">Étudiants</h5>
+                    <p class="card-text fs-2">{{ total_students }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-warning mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">Enseignants</h5>
+                    <p class="card-text fs-2">{{ total_teachers }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-info mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">Cours Totaux</h5>
+                    <p class="card-text fs-2">{{ total_courses }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-secondary mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">Inscriptions Totales</h5>
+                    <p class="card-text fs-2">{{ total_enrollments }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h3 class="mb-4">Rapports par Cours</h3>
+    <div class="card border-0 shadow-sm">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead>
+                        <tr>
+                            <th>Cours</th>
+                            <th>Étudiants Inscrits</th>
+                            <th>Devoirs</th>
+                            <th>Quiz</th>
+                            <th>Note Moyenne (Devoirs)</th>
+                            <th>Score Moyen (Quiz)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for report in reports %}
+                        <tr>
+                            <td>{{ report.course.title }}</td>
+                            <td>{{ report.student_count }}</td>
+                            <td>{{ report.assignment_count }}</td>
+                            <td>{{ report.quiz_count }}</td>
+                            <td>{{ report.avg_assignment_grade|floatformat:2|default:"N/A" }}</td>
+                            <td>{{ report.avg_quiz_score|floatformat:2|default:"N/A" }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

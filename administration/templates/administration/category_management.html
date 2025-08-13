@@ -1,0 +1,252 @@
+{% extends "base.html" %}
+
+{% block title %}Gestion des Catégories - Administration{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'home' %}">Accueil</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Gestion des Catégories</li>
+        </ol>
+    </nav>
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">Gestion des Catégories</h2>
+        <button id="addCategoryBtn" class="btn btn-primary" aria-label="Ajouter une catégorie"><i class="bi bi-plus-circle"></i></button>
+    </div>
+
+    <div class="card border-0 shadow-sm">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead>
+                        <tr>
+                            <th>Nom</th>
+                            <th>Slug</th>
+                            <th class="text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="category-table-body">
+                        {% for category in categories %}
+                        <tr id="category-row-{{ category.id }}">
+                            <td>{{ category.name }}</td>
+                            <td>{{ category.slug }}</td>
+                            <td class="text-center">
+                                <button class="btn btn-sm btn-outline-secondary edit-btn" data-id="{{ category.id }}" aria-label="Modifier la catégorie"><i class="bi bi-pencil"></i></button>
+                                <button class="btn btn-sm btn-outline-danger delete-btn" data-id="{{ category.id }}" aria-label="Supprimer la catégorie"><i class="bi bi-trash"></i></button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal pour Ajouter/Modifier Catégorie -->
+<div class="modal fade" id="categoryModal" tabindex="-1" aria-labelledby="categoryModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="categoryModalLabel">Ajouter une catégorie</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="categoryForm" enctype="multipart/form-data">
+                    <input type="hidden" id="categoryId" name="categoryId">
+                    <div id="form-errors" class="alert alert-danger d-none"></div>
+                    
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Nom</label>
+                        <input type="text" class="form-control" id="name" name="name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="slug" class="form-label">Slug</label>
+                        <input type="text" class="form-control" id="slug" name="slug" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="icon" class="form-label">Icône</label>
+                        <input type="file" class="form-control" id="icon" name="icon">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <button type="button" id="saveCategoryBtn" class="btn btn-primary">
+                    <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                    Sauvegarder
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Confirmation de Suppression -->
+<div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Confirmer la suppression</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>Êtes-vous sûr de vouloir supprimer cette catégorie ?</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+        <button type="button" id="confirmDeleteBtn" class="btn btn-danger">
+                    <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                    Supprimer
+                </button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const categoryModal = new bootstrap.Modal(document.getElementById('categoryModal'));
+    const deleteModal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
+    const categoryForm = document.getElementById('categoryForm');
+    const addCategoryBtn = document.getElementById('addCategoryBtn');
+    const saveCategoryBtn = document.getElementById('saveCategoryBtn');
+    const categoryTableBody = document.getElementById('category-table-body');
+    let currentCategoryId = null;
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    const csrftoken = getCookie('csrftoken');
+
+    function upsertCategoryInTable(category) {
+        let row = document.getElementById(`category-row-${category.id}`);
+        const newRowHtml = `
+            <td>${category.name}</td>
+            <td>${category.slug}</td>
+            <td class="text-center">
+                <button class="btn btn-sm btn-outline-secondary edit-btn" data-id="${category.id}">Modifier</button>
+                <button class="btn btn-sm btn-outline-danger delete-btn" data-id="${category.id}">Supprimer</button>
+            </td>
+        `;
+        if (row) {
+            row.innerHTML = newRowHtml;
+        } else {
+            row = document.createElement('tr');
+            row.id = `category-row-${category.id}`;
+            row.innerHTML = newRowHtml;
+            categoryTableBody.appendChild(row);
+        }
+    }
+
+    addCategoryBtn.addEventListener('click', function () {
+        currentCategoryId = null;
+        categoryForm.reset();
+        document.getElementById('categoryModalLabel').textContent = 'Ajouter une catégorie';
+        document.getElementById('form-errors').classList.add('d-none');
+        categoryModal.show();
+    });
+
+    categoryTableBody.addEventListener('click', function (e) {
+        const target = e.target.closest('button');
+        if (target && target.classList.contains('edit-btn')) {
+            currentCategoryId = target.dataset.id;
+            fetch(`/administration/api/categories/${currentCategoryId}/`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        alert(data.error);
+                        return;
+                    }
+                    categoryForm.reset();
+                    document.getElementById('categoryModalLabel').textContent = 'Modifier une catégorie';
+                    document.getElementById('form-errors').classList.add('d-none');
+                    
+                    document.getElementById('categoryId').value = data.id;
+                    document.getElementById('name').value = data.name;
+                    document.getElementById('slug').value = data.slug;
+                    
+                    categoryModal.show();
+                });
+        }
+        if (target && target.classList.contains('delete-btn')) {
+            currentCategoryId = target.dataset.id;
+            deleteModal.show();
+        }
+    });
+
+    saveCategoryBtn.addEventListener('click', function () {
+        if (!categoryForm.checkValidity()) {
+            categoryForm.reportValidity();
+            return;
+        }
+
+        const spinner = saveCategoryBtn.querySelector('.spinner-border');
+        spinner.classList.remove('d-none');
+        saveCategoryBtn.disabled = true;
+
+        const formData = new FormData(categoryForm);
+        const url = currentCategoryId ? `/administration/api/categories/${currentCategoryId}/update/` : '/administration/api/categories/create/';
+        
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': csrftoken
+            },
+            body: formData
+        })
+        .then(response => response.json())
+        .then(result => {
+            if (result.status === 'success') {
+                categoryModal.hide();
+                upsertCategoryInTable(result.category);
+            } else {
+            }
+        })
+        .finally(() => {
+            spinner.classList.add('d-none');
+            saveCategoryBtn.disabled = false;
+        });
+    });
+
+    document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
+        const spinner = confirmDeleteBtn.querySelector('.spinner-border');
+        spinner.classList.remove('d-none');
+        confirmDeleteBtn.disabled = true;
+
+        fetch(`/administration/api/categories/${currentCategoryId}/delete/`, {
+            method: 'POST',
+            headers: { 'X-CSRFToken': csrftoken }
+        })
+        .then(response => response.json())
+        .then(result => {
+            if (result.status === 'success') {
+                document.getElementById(`category-row-${currentCategoryId}`).remove();
+                deleteModal.hide();
+                showToast(result.message, 'success');
+            } else {
+                showToast(result.message, 'error');
+            }
+        })
+        .finally(() => {
+            spinner.classList.add('d-none');
+            confirmDeleteBtn.disabled = false;
+        });
+    });
+});
+</script>
+{% endblock %}

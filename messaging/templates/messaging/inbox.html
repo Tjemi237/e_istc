@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+
+{% block title %}Boîte de réception{% endblock %}
+
+{% block content %}
+<div class="container">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'home' %}">Accueil</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Boîte de réception</li>
+        </ol>
+    </nav>
+
+    <h2 class="mb-4">Boîte de réception</h2>
+
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header">
+            Démarrer une nouvelle conversation
+        </div>
+        <div class="card-body">
+            <div class="input-group mb-3">
+                <input type="text" class="form-control" id="userSearchInput" placeholder="Rechercher un utilisateur (nom, email, matricule)">
+                <button class="btn btn-outline-secondary" type="button" id="clearSearchBtn" aria-label="Effacer la recherche"><i class="bi bi-x-circle"></i></button>
+            </div>
+            <div id="searchResults" class="list-group">
+                <!-- Search results will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <h3 class="mb-3">Vos conversations</h3>
+    <div class="list-group">
+        {% for conv in conversations %}
+            <a href="{% url 'messaging:conversation_detail' conv.id %}" class="list-group-item list-group-item-action">
+                <div class="d-flex w-100 justify-content-between">
+                    <h5 class="mb-1">
+                        {% for participant in conv.participants.all %}
+                            {% if participant != request.user %}
+                                {{ participant.first_name }} {{ participant.last_name }}
+                            {% endif %}
+                        {% endfor %}
+                    </h5>
+                    <small>{{ conv.updated_at|timesince }}</small>
+                </div>
+                <p class="mb-1">{{ conv.messages.last.content|truncatechars:100 }}</p>
+            </a>
+        {% empty %}
+            <p class="text-center text-muted py-4">Aucune conversation.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const userSearchInput = document.getElementById('userSearchInput');
+    const searchResultsDiv = document.getElementById('searchResults');
+    const clearSearchBtn = document.getElementById('clearSearchBtn');
+    let searchTimeout;
+
+    userSearchInput.addEventListener('keyup', function() {
+        clearTimeout(searchTimeout);
+        const query = this.value.trim();
+        if (query.length > 2) { // Start search after 2 characters
+            searchTimeout = setTimeout(() => {
+                fetch(`/messaging/search_users/?q=${query}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        searchResultsDiv.innerHTML = '';
+                        if (data.users.length > 0) {
+                            data.users.forEach(user => {
+                                const userItem = document.createElement('a');
+                                userItem.href = `/messaging/new/${user.id}/`;
+                                userItem.className = 'list-group-item list-group-item-action';
+                                userItem.innerHTML = `
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h6 class="mb-1">${user.name}</h6>
+                                        <small>${user.matricule ? `(${user.matricule})` : user.email}</small>
+                                    </div>
+                                `;
+                                searchResultsDiv.appendChild(userItem);
+                            });
+                        } else {
+                            searchResultsDiv.innerHTML = '<div class="list-group-item">Aucun utilisateur trouvé.</div>';
+                        }
+                    });
+            }, 300); // Debounce search input
+        } else {
+            searchResultsDiv.innerHTML = '';
+        }
+    });
+
+    clearSearchBtn.addEventListener('click', function() {
+        userSearchInput.value = '';
+        searchResultsDiv.innerHTML = '';
+    });
+});
+</script>
+{% endblock %}

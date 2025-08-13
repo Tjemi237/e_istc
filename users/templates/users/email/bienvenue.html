@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Bienvenue sur E-ISTC</title>
+</head>
+<body>
+    <p>Bonjour {{ user.first_name }},</p>
+    <p>Votre compte a été créé sur la plateforme E-ISTC.</p>
+    <p>Votre identifiant de connexion est : <strong>{{ identifier }}</strong>.</p>
+    <p>Pour des raisons de sécurité, veuillez définir votre propre mot de passe en cliquant sur le lien ci-dessous :</p>
+    <p><a href="{{ reset_link }}">Définir mon mot de passe</a></p>
+    <p>Ce lien est valide pour 24 heures.</p>
+    <p>L'équipe E-ISTC</p>
+</body>
+</html>

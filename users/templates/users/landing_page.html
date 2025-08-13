@@ -1,0 +1,442 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Accueil - E-ISTC{% endblock %}
+
+{% block content %}
+  <header class="py-5" style="background-image: url('{% static 'img/Institut Supérieur ISARE1.jpg' %}'); background-size: cover; background-position: center; background-repeat: no-repeat; color: #fff;">
+    <div class="container text-center text-white" style="background-color: rgba(0, 0, 0, 0.5); padding: 2rem; border-radius: 10px;">
+      <h1 class="display-5 fw-bold">Bienvenue sur la plateforme E-ISTC</h1>
+      <p class="lead">Apprenez à votre rythme avec les meilleurs enseignants de l'ISTC.</p>
+      <a href="{% url 'users:login' %}" class="btn btn-primary btn-lg">Commencer maintenant</a>
+    </div>
+  </header>
+  <!-- SECTION PARTENAIRE ISARE -->
+  <section class="py-5" style="background: url('{% static 'img/isare.png' %}') center center / cover no-repeat; position: relative;">
+    <!-- Overlay semi-transparent blanc pour la lisibilité -->
+    <div style="background-color: rgba(255, 255, 255, 0.85); padding: 2rem 0;">
+      <div class="container">
+        <div class="row align-items-center">
+          <div class="col-md-4 text-center mb-4 mb-md-0">
+            <img src="{% static 'img/Logo-ISARE.jpg' %}" alt="Logo ISARE" class="img-fluid" style="max-height: 150px;">
+          </div>
+          <div class="col-md-8">
+            <h2 class="text-primary">Notre partenaire ISARE</h2>
+            <p>
+              <strong>ISARE</strong> (Institut Supérieur en Administration et Réseau d’Entreprise) est un établissement d’enseignement supérieur réputé pour son excellence académique dans les domaines de la gestion, de l'administration des entreprises et des réseaux informatiques.
+            </p>
+            <p>
+              Grâce à une pédagogie innovante et des formateurs expérimentés, ISARE propose des formations professionnalisantes, alignées sur les besoins du marché du travail et axées sur les compétences pratiques.
+            </p>
+            <ul>
+              <li><strong>Administration des systèmes et réseaux</strong></li>
+              <li><strong>CISCO CCNA ENTREPRISE</strong></li>
+              <li><strong>CISCO NETWORK SECURITY</strong></li>
+              <li><strong>CISCO CYBEROPS ASSOCIATE</strong></li>
+              <li><strong>IT ESSENTIAL</strong></li>
+            </ul>
+            <p class="fst-italic text-muted">Une collaboration stratégique pour élargir vos opportunités d'apprentissage.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- FIN SECTION PARTENAIRE -->
+
+     <!-- SECTION FORMATIONS E-ISTC -->
+  <section class="py-5 bg-light">
+    <div class="container">
+
+      <!-- Titre Encadré Orange -->
+      <div class="text-center mb-5">
+        <div style="display: inline-block; background-color: orange; padding: 10px 30px; border-radius: 8px;">
+          <h2 class="text-white m-0">Nos formations sur E-ISTC </h2>
+          <div style="display: inline-block; background-color: rgb(237, 238, 243); padding: 10px 30px; border-radius: 8px;">
+          <h3 class="text-blue m-0">CYCLE LMD & BTS </h3>
+        </div>
+      </div>
+
+      <!-- Liste verticale des formations -->
+      <div class="row gy-4">
+        <!-- Formation -->
+        <div class="col-12">
+          <div class="d-flex flex-column flex-md-row align-items-center border rounded shadow-sm bg-white p-3">
+            <img src="{% static 'img/GL2.avif' %}" alt="genie Logiciel" class="img-fluid rounded me-md-4 mb-3 mb-md-0" style="width: 220px; height: auto;">
+            <div class="flex-grow-1">
+              <h4 class="mb-2">genie Logiciel</h4>
+              <p>Créez des sites modernes avec HTML, CSS, JavaScript, et frameworks populaires.</p>
+            </div>
+            <a href="#" class="btn btn-success">Disponible</a>
+          </div>
+        </div>
+
+        <div class="col-12">
+          <div class="d-flex flex-column flex-md-row align-items-center border rounded shadow-sm bg-white p-3">
+            <img src="{% static 'img/SANTE2.avif' %}" alt="Sante LMD" class="img-fluid rounded me-md-4 mb-3 mb-md-0" style="width: 220px; height: auto;">
+            <div class="flex-grow-1">
+              <h4 class="mb-2">sante LMD</h4>
+              <p>obtener une carriere dans le domaine de la sante.</p>
+            </div>
+            <a href="#" class="btn btn-success">Disponible</a>
+          </div>
+        </div>
+
+        <div class="col-12">
+          <div class="d-flex flex-column flex-md-row align-items-center border rounded shadow-sm bg-white p-3">
+            <img src="{% static 'img/COM 2.avif' %}" alt="commerce et gestion" class="img-fluid rounded me-md-4 mb-3 mb-md-0" style="width: 220px; height: auto;">
+            <div class="flex-grow-1">
+              <h4 class="mb-2">commerce et gestion</h4>
+              <p>devenz un as de l'entrepreneuriat dans plusieurs domaines .</p>
+            </div>
+            <a href="#" class="btn btn-success">Disponible</a>
+          </div>
+        </div>
+
+        <div class="col-12">
+          <div class="d-flex flex-column flex-md-row align-items-center border rounded shadow-sm bg-white p-3">
+            <img src="{% static 'img/GE2.avif' %}" alt="genie electrique" class="img-fluid rounded me-md-4 mb-3 mb-md-0" style="width: 220px; height: auto;">
+            <div class="flex-grow-1">
+              <h4 class="mb-2">genie electrique</h4>
+              <p>devenez un ingenieur de conception en electricité domestique et industriel.</p>
+            </div>
+            <a href="#" class="btn btn-success">Disponible</a>
+          </div>
+        </div>
+
+        <div class="col-12">
+          <div class="d-flex flex-column flex-md-row align-items-center border rounded shadow-sm bg-white p-3">
+            <img src="{% static 'img/img 2.jpg' %}" alt="Réseaux & Télécom" class="img-fluid rounded me-md-4 mb-3 mb-md-0" style="width: 220px; height: auto;">
+            <div class="flex-grow-1">
+              <h4 class="mb-2">Réseaux & Télécom</h4>
+              <p>Configurez des réseaux locaux, routeurs, switches et téléphonie IP.</p>
+            </div>
+            <a href="#" class="btn btn-success">Disponible</a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+  <!-- FIN SECTION FORMATIONS -->
+   <!-- SECTION SUPPORTS DE COURS -->
+  <section class="py-5 bg-light">
+    <div class="container">
+      
+      <!-- Titre Encadré Bleu -->
+      <div class="text-center mb-5">
+        <a href="#" style="text-decoration: none;">
+          <div style="display: inline-block; background-color: #007bff; padding: 10px 30px; border-radius: 8px;">
+            <h2 class="m-0 text-black">Supports de cours</h2>
+          </div>
+        </a>
+      </div>
+
+      <!-- Grille de supports de cours -->
+      <div class="row g-4">
+        <!-- Support 1 -->
+        <div class="col-md-4 col-sm-6">
+          <div class="card h-100 shadow-sm">
+            <img src="{% static 'img/HTML.avif' %}" class="card-img-top" alt="Cours 1">
+            <div class="card-body text-center">
+              <h5 class="card-title text-dark">Introduction à HTML</h5>
+            </div>
+          </div>
+        </div>
+
+        <!-- Support 2 -->
+        <div class="col-md-4 col-sm-6">
+          <div class="card h-100 shadow-sm">
+            <img src="{% static 'img/res1.avif' %}" class="card-img-top" alt="Cours 2">
+            <div class="card-body text-center">
+              <h5 class="card-title text-dark">Réseaux informatiques</h5>
+            </div>
+          </div>
+        </div>
+
+        <!-- Support 3 -->
+        <div class="col-md-4 col-sm-6">
+          <div class="card h-100 shadow-sm">
+            <img src="{% static 'img/bd.avif' %}" class="card-img-top" alt="Cours 3">
+            <div class="card-body text-center">
+              <h5 class="card-title text-dark">Bases de données SQL</h5>
+            </div>
+          </div>
+        </div>
+
+        <!-- Support 4 -->
+        <div class="col-md-4 col-sm-6">
+          <div class="card h-100 shadow-sm">
+            <img src="{% static 'img/cyber.avif' %}" class="card-img-top" alt="Cours 4">
+            <div class="card-body text-center">
+              <h5 class="card-title text-dark">Cybersécurité</h5>
+            </div>
+          </div>
+        </div>
+
+        <!-- Support 5 -->
+        <div class="col-md-4 col-sm-6">
+          <div class="card h-100 shadow-sm">
+            <img src="{% static 'img/photoshop.avif' %}" class="card-img-top" alt="Cours 5">
+            <div class="card-body text-center">
+              <h5 class="card-title text-dark">Photoshop & Design</h5>
+            </div>
+          </div>
+        </div>
+
+        <!-- Support 6 -->
+        <div class="col-md-4 col-sm-6">
+          <div class="card h-100 shadow-sm">
+            <img src="{% static 'img/python.avif' %}" class="card-img-top" alt="Cours 6">
+            <div class="card-body text-center">
+              <h5 class="card-title text-dark">Python pour débutants</h5>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+    </div>
+  </section>
+  <!-- FIN SECTION SUPPORTS DE COURS -->
+   <!-- SECTION TÉMOIGNAGES -->
+  <section class="py-5 bg-light">
+    <div class="container">
+      <div class="text-center mb-5">
+        <h2 class="fw-bold">Témoignages</h2>
+        <p class="text-muted">Quelques retours de nos utilisateurs</p>
+      </div>
+
+      <div class="row row-cols-1 row-cols-md-2 g-4">
+        <!-- Étudiant 1 -->
+        <div class="col d-flex align-items-start">
+          <img src="{% static 'img/TEMOIN 1.png' %}" alt="Étudiant 1" class="rounded-circle me-3 mt-1" style="width: 80px; height: 80px; object-fit: cover;">
+          <div>
+            <h5 class="mb-1">BRICE FABO</h5>
+            <p class="mb-1 text-muted">Étudiant en Génie Logiciel licence 3 cycle LMD</p>
+            <p class="fst-italic text-secondary">"Les cours sont bien structurés et accessibles même hors campus."</p>
+          </div>
+        </div>
+
+        <!-- Enseignant 1 -->
+        <div class="col d-flex align-items-start">
+          <img src="{% static 'img/temoin 2.png' %}" alt="Enseignant 1" class="rounded-circle me-3 mt-1" style="width: 80px; height: 80px; object-fit: cover;">
+          <div>
+            <h5 class="mb-1">M.DAGHA CINCLAIRE</h5>
+            <p class="mb-1 text-muted">Enseignant - Algorithme et complexité</p>
+            <p class="fst-italic text-secondary">"La plateforme facilite un bon suivi pédagogique avec mes étudiants."</p>
+          </div>
+        </div>
+
+        <!-- Étudiant 2 -->
+        <div class="col d-flex align-items-start">
+          <img src="{% static 'img/TEMOIN 4.png' %}" alt="Étudiant 2" class="rounded-circle me-3 mt-1" style="width: 80px; height: 80px; object-fit: cover;">
+          <div>
+            <h5 class="mb-1">CHRISTIAN ABE</h5>
+            <p class="mb-1 text-muted">Étudiant en administration et securité reseau - L3</p>
+            <p class="fst-italic text-secondary">"J'apprécie la flexibilité et la diversité des cours proposés."</p>
+          </div>
+        </div>
+
+        <!-- Enseignant 2 -->
+        <div class="col d-flex align-items-start">
+          <img src="{% static 'img/TEMOIN 5.png' %}" alt="Enseignant 2" class="rounded-circle me-3 mt-1" style="width: 80px; height: 80px; object-fit: cover;">
+          <div>
+            <h5 class="mb-1">Ing DIFFOUON NTAZO</h5>
+            <p class="mb-1 text-muted">Enseignante - UX/UI Design</p>
+            <p class="fst-italic text-secondary">"Une interface conviviale qui rend l'enseignement en ligne agréable."</p>
+          </div>
+        </div>
+
+        <!-- Étudiant 3 -->
+        <div class="col d-flex align-items-start">
+          <img src="{% static 'img/TEMOIN 6.png' %}" alt="Étudiant 3" class="rounded-circle me-3 mt-1" style="width: 80px; height: 80px; object-fit: cover;">
+          <div>
+            <h5 class="mb-1">TJEMI SIMON PIERRE </h5>
+            <p class="mb-1 text-muted">Étudiant en soins infirmiers 2 - L3</p>
+            <p class="fst-italic text-secondary">"Les supports sont téléchargeables et disponibles à tout moment."</p>
+          </div>
+        </div>
+
+        <!-- Enseignant 3 -->
+        <div class="col d-flex align-items-start">
+          <img src="{% static 'img/TEMOIN 7.png' %}" alt="Enseignant 3" class="rounded-circle me-3 mt-1" style="width: 80px; height: 80px; object-fit: cover;">
+          <div>
+            <h5 class="mb-1">Dr. Ouattara Idriss</h5>
+            <p class="mb-1 text-muted">Directeur des affaires académique de l'e-istc</p>
+            <p class="fst-italic text-secondary">"Je peux facilement partager les annonces et collaborer les enseignants et etudiants à travers le plateforme e-istc ."</p>
+          </div>
+        </div>
+
+        <!-- Étudiant 4 -->
+        <div class="col d-flex align-items-start">
+          <img src="{% static 'img/TEMOINS3.png' %}" alt="Étudiant 4" class="rounded-circle me-3 mt-1" style="width: 80px; height: 80px; object-fit: cover;">
+          <div>
+            <h5 class="mb-1">LOVELYNE ETOGA</h5>
+            <p class="mb-1 text-muted">Étudiante en electrotechnique - L1</p>
+            <p class="fst-italic text-secondary">"Une plateforme moderne et facile à utiliser au quotidien."</p>
+          </div>
+        </div>
+
+        <!-- Enseignant 4 -->
+        <div class="col d-flex align-items-start">
+          <img src="{% static 'img/TEMOIN38.jpg' %}" alt="Enseignant 4" class="rounded-circle me-3 mt-1" style="width: 80px; height: 80px; object-fit: cover;">
+          <div>
+            <h5 class="mb-1">Mme FABIOLA MEKAN </h5>
+            <p class="mb-1 text-muted">Enseignante - Développement Web</p>
+            <p class="fst-italic text-secondary">"E-ISTC est un outil indispensable pour l'apprentissage à distance."</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- BOUTON Voir plus -->
+      <div class="text-center mt-5">
+        <a href="#!" class="btn btn-outline-primary btn-lg px-4">
+          Voir plus de témoignages
+        </a>
+      </div>
+    </div>
+  </section>
+  <!-- FIN SECTION TÉMOIGNAGES -->
+   <!-- SECTION ÉCOLES PARTENAIRES À L'ÉTRANGER -->
+  <section class="py-5" style="background-color: #f57c00;">
+    <div class="container">
+      <div class="bg-orange p-4 rounded shadow" style="background-color: #ff9800;">
+        <div class="d-flex align-items-center mb-4">
+          <img src="{% static 'img/E-LEARNING (3).png' %}" alt="Logo E-ISTC" style="width: 60px; height: 60px;" class="me-3">
+          <div>
+            <h4 class="text-white m-0">E-ISTC</h4>
+            <p class="text-white mb-0" style="font-size: 0.9rem;">formation en ligne de l'institut superieur de technologie et de commerce </p>
+          </div>
+        </div>
+
+        <div class="text-white">
+          <h5 class="mb-3">Nos écoles partenaires à l’étranger</h5>
+          <div class="row text-center">
+            <!-- École 1 -->
+            <div class="col-6 col-md-2 mb-3">
+              <img src="{% static 'img/ECOLE1.png' %}" alt="École 1" class="img-fluid mb-2" style="max-height: 60px;">
+              <p class="small">campus de lyon</p>
+            </div>
+            <!-- École 2 -->
+            <div class="col-6 col-md-2 mb-3">
+              <img src="{% static 'img/ECOLE2.jpeg' %}" alt="École 2" class="img-fluid mb-2" style="max-height: 60px;">
+              <p class="small">instutut de strasbourg</p>
+            </div>
+            <!-- École 3 -->
+            <div class="col-6 col-md-2 mb-3">
+              <img src="{% static 'img/ECOLE3.png' %}" alt="École 3" class="img-fluid mb-2" style="max-height: 60px;">
+              <p class="small">academie de lyon</p>
+            </div>
+            <!-- École 4 -->
+            <div class="col-6 col-md-2 mb-3">
+              <img src="{% static 'img/ECOLE4.png' %}" alt="École 4" class="img-fluid mb-2" style="max-height: 60px;">
+              <p class="small">campus de marseille</p>
+            </div>
+            <!-- École 5 -->
+            <div class="col-6 col-md-2 mb-3">
+              <img src="{% static 'img/ECOLE5.png' %}" alt="École 5" class="img-fluid mb-2" style="max-height: 60px;">
+              <p class="small">haute ecole de paris</p>
+            </div>
+            <!-- École 6 -->
+            <div class="col-6 col-md-2 mb-3">
+              <img src="{% static 'img/ECOLE6.jpeg' %}" alt="École 6" class="img-fluid mb-2" style="max-height: 60px;">
+              <p class="small">campus de lyon</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- FIN SECTION ÉCOLES PARTENAIRES -->
+   <!-- SECTION DOMAINES ET FILIÈRES -->
+  <section class="py-5 bg-light">
+    <div class="container">
+      <div class="row row-cols-1 row-cols-md-5 g-4 mb-4 text-center">
+
+        <!-- Domaine 1 -->
+        <div class="col">
+          <div class="bg-primary text-white fw-bold py-2 rounded mb-2">Génie Logiciel</div>
+          <ul class="list-unstyled">
+            <li><a href="#" class="text-decoration-none text-dark">Génie Logiciel</a></li>
+            <li><a href="#" class="text-decoration-none text-dark">Infographie et Web Design</a></li>
+            <li><a href="#" class="text-decoration-none text-dark">E-commerce et marketing numérique</a></li>
+             <li><a href="#" class="text-decoration-none text-dark">Maintenance des systèmes informatiques</a></li>
+          </ul>
+        </div>
+
+        <!-- Domaine 2 -->
+        <div class="col">
+          <div class="bg-primary text-white fw-bold py-2 rounded mb-2">Réseaux & Télécommunication</div>
+          <ul class="list-unstyled">
+            <li><a href="#" class="text-decoration-none text-dark">Télécommunications</a></li>
+            <li><a href="#" class="text-decoration-none text-dark">Réseaux & sécurité</a></li>
+            <li><a href="#" class="text-decoration-none text-dark">Informatique industriel & automatique </a></li>
+          </ul>
+        </div>
+
+        <!-- Domaine 3 -->
+        <div class="col">
+          <div class="bg-primary text-white fw-bold py-2 rounded mb-2">Génie électrique</div>
+          <ul class="list-unstyled">
+            <li><a href="#" class="text-decoration-none text-dark">Électrotechnique</a></li>
+            <li><a href="#" class="text-decoration-none text-dark">Maintenance des systèmes électroniques</a></li>
+            <li><a href="#" class="text-decoration-none text-dark">Contrôle instrumentation & régulation</a></li>
+             <li><a href="#" class="text-decoration-none text-dark">Maintenance des appareils biomédicaux</a></li>
+          </ul>
+        </div>
+
+        <!-- Domaine 4 -->
+        <div class="col">
+          <div class="bg-primary text-white fw-bold py-2 rounded mb-2">Santé LMD</div>
+          <ul class="list-unstyled">
+            <li><a href="#" class="text-decoration-none text-dark">Soins infirmiers</a></li>
+            <li><a href="#" class="text-decoration-none text-dark">Sage-femme</a></li>
+            <li><a href="#" class="text-decoration-none text-dark">Sciences pharmaceutiques</a></li>
+            <li><a href="#" class="text-decoration-none text-dark">Technique de laboratoire & analyse médicale</a></li>
+            
+
+          </ul>
+        </div>
+
+        <!-- Domaine 5 -->
+        <div class="col">
+          <div class="bg-primary text-white fw-bold py-2 rounded mb-2">Commerce & gestion</div>
+          <ul class="list-unstyled">
+            <li><a href="#" class="text-decoration-none text-dark">Comptabilité et gestion des entreprises</a></li>
+            <li><a href="#" class="text-decoration-none text-dark">Comptabilité et finances publiques</a></li>
+            <li><a href="#" class="text-decoration-none text-dark">Gestion logistique & transport</a></li>
+            <li><a href="#" class="text-decoration-none text-dark">Banque & finances</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Autres colonnes -->
+      <div class="row row-cols-1 row-cols-md-2 g-4 mt-4">
+        <div class="col">
+          <h5 class="fw-bold text-primary">Ressources complémentaires</h5>
+          <ul class="list-unstyled">
+            <li><a href="#" class="text-decoration-none text-dark">Support pédagogique</a></li>
+            <li><a href="#" class="text-decoration-none text-dark">Tutoriels vidéo</a></li>
+            <li><a href="#" class="text-decoration-none text-dark">Webinaires</a></li>
+            <li><a href="#" class="text-decoration-none text-dark">Classes virtuelles</a></li>
+          </ul>
+        </div>
+
+        <!-- Contact & Adresse -->
+        <div class="col">
+          <h5 class="fw-bold text-primary">Contact & Adresse</h5>
+          <ul class="list-unstyled">
+            <li><i class="bi bi-telephone-fill me-2 text-primary"></i> Tél : +237 698215372 / 677606398</li>
+            <li><i class="bi bi-envelope-fill me-2 text-primary"></i> Email : contact@e-istc.edu.ci</li>
+            <li><i class="bi bi-geo-alt-fill me-2 text-primary"></i> Awae, escalier station nickel oil</li>
+            <li class="mt-2">
+              <a href="#" class="me-2 text-decoration-none text-primary"><i class="bi bi-facebook fs-5"></i></a>
+              <a href="#" class="me-2 text-decoration-none text-primary"><i class="bi bi-twitter fs-5"></i></a>
+              <a href="#" class="me-2 text-decoration-none text-primary"><i class="bi bi-linkedin fs-5"></i></a>
+              <a href="#" class="text-decoration-none text-primary"><i class="bi bi-youtube fs-5"></i></a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+{% endblock %}

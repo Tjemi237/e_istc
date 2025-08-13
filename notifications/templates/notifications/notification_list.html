@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% block title %}Notifications{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'home' %}">Accueil</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Notifications</li>
+        </ol>
+    </nav>
+
+    <h2 class="mb-4">Notifications</h2>
+
+    <div class="list-group">
+        {% for notification in notifications %}
+        <div class="card mb-3 shadow-sm {% if not notification.is_read %}border-primary{% else %}border-light{% endif %}">
+            <a href="{{ notification.link }}" class="list-group-item list-group-item-action {% if not notification.is_read %}list-group-item-info{% endif %}" data-notification-id="{{ notification.id }}">
+                <div class="d-flex align-items-center">
+                    <i class="notification-icon bi me-3 fs-4"></i>
+                    <div class="flex-grow-1">
+                        <p class="mb-1">{{ notification.message }}</p>
+                        <small class="text-muted">{{ notification.created_at|timesince }} ago</small>
+                    </div>
+                </div>
+            </a>
+        </div>
+        {% empty %}
+            <p class="text-center text-muted py-4">Aucune notification.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const notificationLinks = document.querySelectorAll('.list-group-item-action');
+    const csrftoken = getCookie('csrftoken');
+
+    notificationLinks.forEach(link => {
+        link.addEventListener('click', function (e) {
+            const notificationId = this.dataset.notificationId;
+            const url = `/notifications/${notificationId}/read/`;
+
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrftoken
+                }
+            });
+        });
+
+        // Assign icons based on message content
+        const message = link.querySelector('p').textContent.toLowerCase();
+        const iconElement = link.querySelector('.notification-icon');
+
+        if (message.includes('annonce')) {
+            iconElement.classList.add('bi-megaphone');
+        } else if (message.includes('évaluation') || message.includes('devoir') || message.includes('quiz') || message.includes('sondage')) {
+            iconElement.classList.add('bi-journal-check');
+        } else if (message.includes('message')) {
+            iconElement.classList.add('bi-chat-dots');
+        } else {
+            iconElement.classList.add('bi-info-circle'); // Default icon
+        }
+    });
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+});
+</script>
+{% endblock %}

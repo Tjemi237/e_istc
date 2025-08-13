@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %}Forum du cours: {{ course.title }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            {% if request.user.role == 'ETUDIANT' %}
+            <li class="breadcrumb-item"><a href="{% url 'users:etudiant_dashboard' %}">Tableau de Bord</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'users:student_course_detail' course.id %}">{{ course.title }}</a></li>
+            {% else %}
+            <li class="breadcrumb-item"><a href="{% url 'administration:course_detail_page' course.id %}">{{ course.title }}</a></li>
+            {% endif %}
+            <li class="breadcrumb-item active" aria-current="page">Forum</li>
+        </ol>
+    </nav>
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Forum du cours: {{ course.title }}</h2>
+        <a href="{% url 'forums:creer_sujet' course.id %}" class="btn btn-primary" aria-label="Lancer une nouvelle discussion"><i class="bi bi-chat-right-text"></i> Lancer une nouvelle discussion</a>
+    </div>
+
+    <div class="card border-0 shadow-sm">
+        <div class="card-body">
+            <ul class="list-group list-group-flush">
+                {% for sujet in sujets %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <div>
+                        <a href="{% url 'forums:details_sujet' sujet.id %}" class="text-decoration-none">
+                            <h5 class="mb-1">{{ sujet.titre }}</h5>
+                        </a>
+                        <small>
+                            Par {{ sujet.auteur.first_name }} {{ sujet.auteur.last_name }}
+                            le {{ sujet.cree_le|date:"d/m/Y à H:i" }}
+                        </small>
+                    </div>
+                    <div class="text-end">
+                        <span class="badge bg-primary rounded-pill">{{ sujet.messages.count }} message(s)</span><br>
+                        <small class="text-muted">Dernière réponse le {{ sujet.mis_a_jour_le|date:"d/m/Y à H:i" }}</small>
+                    </div>
+                </li>
+                {% empty %}
+                <li class="list-group-item">
+                    <p class="text-center text-muted py-4">Aucune discussion pour le moment. Soyez le premier à en lancer une !</p>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}

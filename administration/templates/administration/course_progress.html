@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}Progression du Cours - {{ course.title }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'administration:course_management' %}">Gestion des Cours</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'administration:course_detail_page' course.id %}">{{ course.title }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Progression des Étudiants</li>
+        </ol>
+    </nav>
+
+    <h2 class="mb-4">Progression des Étudiants pour le cours : {{ course.title }}</h2>
+
+    <div class="card border-0 shadow-sm">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead>
+                        <tr>
+                            <th>Étudiant</th>
+                            <th>Progression</th>
+                            <th class="text-center">Ressources Complétées</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for data in progress_data %}
+                        <tr>
+                            <td>{{ data.student.first_name }} {{ data.student.last_name }}</td>
+                            <td>
+                                <div class="progress">
+                                    <div class="progress-bar" role="progressbar" style="width: {{ data.progress }}%;" aria-valuenow="{{ data.progress }}" aria-valuemin="0" aria-valuemax="100">{{ data.progress|floatformat:2 }}%</div>
+                                </div>
+                            </td>
+                            <td class="text-center">{{ data.completed_ressources }} / {{ data.total_ressources }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

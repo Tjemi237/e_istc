@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %}Quiz déjà passé{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'home' %}">Accueil</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'users:student_course_detail' activite.course.id %}">Cours: {{ activite.course.title }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Quiz déjà passé</li>
+        </ol>
+    </nav>
+
+    <div class="alert alert-warning" role="alert">
+        <h4 class="alert-heading">Quiz déjà passé !</h4>
+        <p>Vous avez déjà soumis le quiz "{{ activite.title }}".</p>
+        <hr>
+        <p class="mb-0">Vous pouvez consulter vos résultats dans la section "Mes Notes" (à venir) ou retourner à la page du cours.</p>
+    </div>
+    <a href="{% url 'users:student_course_detail' activite.course.id %}" class="btn btn-primary">Retour au cours</a>
+</div>
+{% endblock %}

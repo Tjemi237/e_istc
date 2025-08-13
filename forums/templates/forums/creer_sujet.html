@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}Lancer une nouvelle discussion{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            {% if request.user.role == 'ETUDIANT' %}
+            <li class="breadcrumb-item"><a href="{% url 'users:etudiant_dashboard' %}">Tableau de Bord</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'users:student_course_detail' course.id %}">{{ course.title }}</a></li>
+            {% else %}
+            <li class="breadcrumb-item"><a href="{% url 'administration:course_detail_page' course.id %}">{{ course.title }}</a></li>
+            {% endif %}
+            <li class="breadcrumb-item"><a href="{% url 'forums:forum_cours' course.id %}">Forum</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Nouvelle discussion</li>
+        </ol>
+    </nav>
+
+    <h2>Lancer une nouvelle discussion dans le cours : {{ course.title }}</h2>
+
+    <div class="card mt-4 border-0 shadow-sm">
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="{{ sujet_form.titre.id_for_label }}" class="form-label">Sujet</label>
+                    {{ sujet_form.titre }}
+                </div>
+                <div class="mb-3">
+                    <label for="{{ message_form.contenu.id_for_label }}" class="form-label">Votre premier message</label>
+                    {{ message_form.contenu }}
+                </div>
+                <button type="submit" class="btn btn-primary"><i class="bi bi-send"></i> Publier le sujet</button>
+                <a href="{% url 'forums:forum_cours' course.id %}" class="btn btn-secondary"><i class="bi bi-x-circle"></i> Annuler</a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %}Pas de questions{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'home' %}">Accueil</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'users:student_course_detail' activite.course.id %}">Cours: {{ activite.course.title }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Pas de questions</li>
+        </ol>
+    </nav>
+
+    <div class="alert alert-info" role="alert">
+        <h4 class="alert-heading">Aucune question !</h4>
+        <p>Le quiz "{{ activite.title }}" ne contient pas encore de questions.</p>
+        <hr>
+        <p class="mb-0">Veuillez contacter votre enseignant pour plus d'informations.</p>
+    </div>
+    <a href="{% url 'users:student_course_detail' activite.course.id %}" class="btn btn-primary">Retour au cours</a>
+</div>
+{% endblock %}

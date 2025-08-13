@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+
+{% block title %}Conversation{% endblock %}
+
+{% block extra_css %}
+<style>
+    .chat-box {
+        height: 500px;
+        overflow-y: scroll;
+        padding: 1rem;
+        background-color: #f8f9fa;
+    }
+    .message-container {
+        display: flex;
+        margin-bottom: 1rem;
+    }
+    .message-container.sent {
+        justify-content: flex-end;
+    }
+    .message-container.received {
+        justify-content: flex-start;
+    }
+    .message-bubble {
+        max-width: 70%;
+        padding: 0.75rem 1rem;
+        border-radius: 1rem;
+        position: relative;
+    }
+    .message-bubble.sent {
+        background-color: var(--bs-primary);
+        color: white;
+        border-top-right-radius: 0.25rem;
+    }
+    .message-bubble.received {
+        background-color: #e9ecef;
+        color: black;
+        border-top-left-radius: 0.25rem;
+    }
+    .message-info {
+        font-size: 0.75rem;
+        color: #6c757d;
+        margin-top: 0.25rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'messaging:inbox' %}">Boîte de réception</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Conversation</li>
+        </ol>
+    </nav>
+
+    <h2 class="mb-3">Conversation avec 
+        {% for participant in conversation.participants.all %}
+            {% if participant != request.user %}
+                {{ participant.first_name }} {{ participant.last_name }}
+            {% endif %}
+        {% endfor %}
+    </h2>
+
+    <div class="card border-0 shadow-sm">
+        <div class="card-body chat-box" id="chat-box">
+            {% for message in conversation.messages.all %}
+                <div class="message-container {% if message.sender == request.user %}sent{% else %}received{% endif %}">
+                    <div class="message-bubble {% if message.sender == request.user %}sent{% else %}received{% endif %}">
+                        <p class="mb-0">{{ message.content }}</p>
+                        <div class="message-info text-end mt-1">
+                            {{ message.timestamp|date:"H:i" }}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        <div class="card-footer">
+            <form method="post">
+                {% csrf_token %}
+                <div class="input-group">
+                    <input type="text" name="content" class="form-control" placeholder="Votre message..." autofocus>
+                    <button type="submit" class="btn btn-primary" aria-label="Envoyer le message"><i class="bi bi-send"></i></button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Auto-scroll to the bottom of the chat box
+    const chatBox = document.getElementById('chat-box');
+    chatBox.scrollTop = chatBox.scrollHeight;
+</script>
+{% endblock %}

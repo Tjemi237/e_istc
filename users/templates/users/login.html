@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Connexion - E-ISTC{% endblock %}
+
+{% block extra_css %}
+<style>
+    body {
+        background-color: #f4f7f6;
+    }
+    .login-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: calc(100vh - 120px); /* Adjust based on header/footer height */
+    }
+    .login-card {
+        width: 100%;
+        max-width: 450px;
+        border-radius: 1rem;
+        overflow: hidden;
+    }
+    .login-header {
+        background-color: var(--bs-primary);
+        color: white;
+        padding: 2rem;
+        text-align: center;
+    }
+    .login-header img {
+        max-width: 80px;
+        margin-bottom: 1rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="login-container">
+    <div class="card shadow-lg border-0 login-card">
+        <div class="login-header">
+            {% if platform_settings.logo %}
+                <img src="{{ platform_settings.logo.url }}" alt="Logo" class="rounded-circle">
+            {% else %}
+                 <img src="{% static 'img/E-LEARNING (3).png' %}" alt="Logo e-ISTC" class="rounded-circle">
+            {% endif %}
+            <h3 class="fw-bold mb-0">Bienvenue</h3>
+            <p class="mb-0">Connectez-vous à votre compte</p>
+        </div>
+        <div class="card-body p-4 p-md-5">
+            {% if form.non_field_errors %}
+                <div class="alert alert-danger text-center p-2">
+                    {% for error in form.non_field_errors %}
+                        {{ error }}
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <form method="post" id="loginForm" novalidate>
+                {% csrf_token %}
+                <div class="form-floating mb-3">
+                    {{ form.username }}
+                    <label for="id_username">Matricule, Email ou Nom d'utilisateur</label>
+                </div>
+                <div class="form-floating mb-3">
+                    {{ form.password }}
+                    <label for="id_password">Mot de passe</label>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div class="form-check">
+                        <input type="checkbox" class="form-check-input" id="rememberMe" name="remember_me">
+                        <label class="form-check-label" for="rememberMe">Se souvenir de moi</label>
+                    </div>
+                    <a href="{% url 'users:password_reset' %}" class="text-decoration-none">Mot de passe oublié ?</a>
+                </div>
+
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                        Connexion
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const loginForm = document.getElementById('loginForm');
+    if (loginForm) {
+        const submitButton = loginForm.querySelector('button[type="submit"]');
+        const spinner = submitButton.querySelector('.spinner-border');
+
+        loginForm.addEventListener('submit', function(e) {
+            if (!loginForm.checkValidity()) {
+                e.preventDefault();
+                e.stopPropagation();
+            } else {
+                spinner.classList.remove('d-none');
+                submitButton.disabled = true;
+            }
+            loginForm.classList.add('was-validated');
+        });
+    }
+});
+</script>
+{% endblock %}

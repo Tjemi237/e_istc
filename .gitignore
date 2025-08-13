@@ -1,0 +1,61 @@
+# Fichiers de Bytecode, optimisés ou DLL
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Variables d'environnement
+# Ne jamais versionner vos secrets !
+.env
+*.env
+
+# Environnement Virtuel
+venv/
+env/
+.venv/
+ENV/
+.ENV/
+
+# Spécifique au projet Django
+# Base de données de développement
+*.sqlite3
+# Fichiers téléversés par les utilisateurs
+media/
+# Fichiers statiques collectés pour le déploiement
+staticfiles/
+
+# Fichiers de logs
+*.log
+logs/
+
+# Configuration IDE et éditeur
+.vscode/
+.idea/
+*.swp
+*.sublime-workspace
+*.sublime-project
+
+# Fichiers générés par le système d'exploitation
+.DS_Store
+Thumbs.db
+
+# Fichiers de test et de couverture de code
+.coverage
+.coverage.*
+.pytest_cache/
+htmlcov/
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.tox/
+
+# Artefacts de build
+build/
+dist/
+*.egg-info/
+.eggs/
+MANIFEST
+
+# Autres
+*.bak

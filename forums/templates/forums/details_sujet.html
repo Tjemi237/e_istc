@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block title %}Sujet: {{ sujet.titre }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            {% if request.user.role == 'ETUDIANT' %}
+            <li class="breadcrumb-item"><a href="{% url 'users:etudiant_dashboard' %}">Tableau de Bord</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'users:student_course_detail' course.id %}">{{ course.title }}</a></li>
+            {% else %}
+            <li class="breadcrumb-item"><a href="{% url 'administration:course_detail_page' course.id %}">{{ course.title }}</a></li>
+            {% endif %}
+            <li class="breadcrumb-item"><a href="{% url 'forums:forum_cours' course.id %}">Forum</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ sujet.titre|truncatechars:50 }}</li>
+        </ol>
+    </nav>
+
+    <h2 class="mb-3">{{ sujet.titre }}</h2>
+
+    {% for message in messages %}
+    <div class="card mb-3 border-0 shadow-sm" id="message-{{ message.id }}">
+        <div class="card-header d-flex justify-content-between">
+            <strong>{{ message.auteur.first_name }} {{ message.auteur.last_name }}</strong>
+            <small class="text-muted">{{ message.cree_le|date:"d/m/Y à H:i" }}</small>
+        </div>
+        <div class="card-body">
+            <p>{{ message.contenu|linebreaksbr }}</p>
+        </div>
+        {% if request.user == message.auteur or request.user == course.teacher or request.user.role == 'ADMIN' %}
+        <div class="card-footer text-end">
+            <form action="{% url 'forums:supprimer_message' message.id %}" method="post" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce message ?');">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-sm btn-outline-danger" aria-label="Supprimer le message"><i class="bi bi-trash"></i></button>
+            </form>
+        </div>
+        {% endif %}
+    </div>
+    {% endfor %}
+
+    <hr>
+
+    <div class="card mt-4 border-0 shadow-sm">
+        <div class="card-header">
+            <h5>Répondre</h5>
+        </div>
+        <div class="card-body">
+            <form action="{% url 'forums:ajouter_message' sujet.id %}" method="post">
+                {% csrf_token %}
+                {{ message_form.as_p }}
+                <button type="submit" class="btn btn-primary" aria-label="Envoyer la réponse"><i class="bi bi-send"></i> Envoyer la réponse</button>
+            </form>
+        </div>
+    </div>
+
+    {% if request.user == sujet.auteur or request.user == course.teacher or request.user.role == 'ADMIN' %}
+    <div class="mt-4 text-end">
+         <form action="{% url 'forums:supprimer_sujet' sujet.id %}" method="post" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce sujet et tous ses messages ?');">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger" aria-label="Supprimer le sujet entier"><i class="bi bi-trash"></i> Supprimer le Sujet Entier</button>
+        </form>
+    </div>
+    {% endif %}
+
+</div>
+{% endblock %}

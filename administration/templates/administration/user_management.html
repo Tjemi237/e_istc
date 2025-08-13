@@ -1,0 +1,363 @@
+{% extends "base.html" %}
+
+{% block title %}Gestion des Utilisateurs - Administration{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'home' %}">Accueil</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Gestion des Utilisateurs</li>
+        </ol>
+    </nav>
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">Gestion des Utilisateurs</h2>
+        <button id="addUserBtn" class="btn btn-primary" aria-label="Ajouter un utilisateur"><i class="bi bi-person-plus"></i></button>
+    </div>
+
+    <div class="card border-0 shadow-sm">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead>
+                        <tr>
+                            <th>Nom</th>
+                            <th>Email</th>
+                            <th>Rôle</th>
+                            <th class="text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="user-table-body">
+                        {% for user in users %}
+                        <tr id="user-row-{{ user.id }}">
+                            <td>{{ user.last_name }} {{ user.first_name }}</td>
+                            <td>{{ user.email }}</td>
+                            <td><span class="badge bg-info">{{ user.get_role_display }}</span></td>
+                            <td class="text-center">
+                                <button class="btn btn-sm btn-outline-secondary edit-btn" data-id="{{ user.id }}" aria-label="Modifier l'utilisateur"><i class="bi bi-pencil"></i></button>
+                                <button class="btn btn-sm btn-outline-danger delete-btn" data-id="{{ user.id }}" aria-label="Supprimer l'utilisateur"><i class="bi bi-trash"></i></button>
+                                {% if user.is_locked %}
+                                    <button class="btn btn-sm btn-outline-success lock-btn" data-id="{{ user.id }}" data-action="unlock" aria-label="Déverrouiller l'utilisateur"><i class="bi bi-unlock"></i></button>
+                                {% else %}
+                                    <button class="btn btn-sm btn-outline-warning lock-btn" data-id="{{ user.id }}" data-action="lock" aria-label="Verrouiller l'utilisateur"><i class="bi bi-lock"></i></button>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal pour Ajouter/Modifier Utilisateur -->
+<div class="modal fade" id="userModal" tabindex="-1" aria-labelledby="userModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="userModalLabel">Ajouter un utilisateur</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="userForm" enctype="multipart/form-data">
+                    <input type="hidden" id="userId" name="userId">
+                    <div id="form-errors" class="alert alert-danger d-none"></div>
+                    
+                    <div class="mb-3">
+                        <label for="role" class="form-label">Rôle</label>
+                        <select class="form-select" id="role" name="role" required>
+                            <option value="ETUDIANT">Étudiant</option>
+                            <option value="ENSEIGNANT">Enseignant</option>
+                            <option value="ADMIN">Admin</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="username" class="form-label">Nom d'utilisateur</label>
+                        <input type="text" class="form-control" id="username" name="username">
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="email" name="email" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="first_name" class="form-label">Prénom</label>
+                        <input type="text" class="form-control" id="first_name" name="first_name">
+                    </div>
+                    <div class="mb-3">
+                        <label for="last_name" class="form-label">Nom</label>
+                        <input type="text" class="form-control" id="last_name" name="last_name">
+                    </div>
+
+                    <!-- Champs spécifiques -->
+                    <div id="matricule-field" class="mb-3 d-none">
+                        <label for="matricule" class="form-label">Matricule</label>
+                        <input type="text" class="form-control" id="matricule" name="matricule">
+                    </div>
+                    <div id="specialite-field" class="mb-3 d-none">
+                        <label for="specialite" class="form-label">Spécialité</label>
+                        <input type="text" class="form-control" id="specialite" name="specialite">
+                    </div>
+                    <div class="mb-3">
+                        <label for="photo" class="form-label">Photo de profil</label>
+                        <input type="file" class="form-control" id="photo" name="photo">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <button type="button" id="saveUserBtn" class="btn btn-primary">
+                    <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                    Sauvegarder
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Confirmation de Suppression -->
+<div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Confirmer la suppression</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>Êtes-vous sûr de vouloir supprimer cet utilisateur ? Cette action est irréversible.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+        <button type="button" id="confirmDeleteBtn" class="btn btn-danger">
+                    <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                    Supprimer
+                </button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    console.log('Script user_management.html chargé.');
+    const userModal = new bootstrap.Modal(document.getElementById('userModal'));
+    const deleteModal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
+    const userForm = document.getElementById('userForm');
+    const addUserBtn = document.getElementById('addUserBtn');
+    const saveUserBtn = document.getElementById('saveUserBtn');
+    const userTableBody = document.getElementById('user-table-body');
+    const roleSelect = document.getElementById('role');
+    let currentUserId = null;
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    const csrftoken = getCookie('csrftoken');
+
+    function toggleSpecificFields() {
+        const role = roleSelect.value;
+        document.getElementById('matricule-field').classList.toggle('d-none', role !== 'ETUDIANT');
+        document.getElementById('specialite-field').classList.toggle('d-none', role !== 'ENSEIGNANT');
+        document.getElementById('username').closest('.mb-3').classList.toggle('d-none', role === 'ETUDIANT');
+    }
+
+    function getRoleBadge(role) {
+        const roles = {
+            'ADMIN': 'bg-danger',
+            'ENSEIGNANT': 'bg-warning text-dark',
+            'ETUDIANT': 'bg-info'
+        };
+        return roles[role] || 'bg-secondary';
+    }
+
+    function upsertUserInTable(user) {
+        let row = document.getElementById(`user-row-${user.id}`);
+        const lockButtonHtml = user.is_locked
+            ? `<button class="btn btn-sm btn-outline-success lock-btn" data-id="${user.id}" data-action="unlock" aria-label="Déverrouiller l'utilisateur"><i class="bi bi-unlock"></i></button>`
+            : `<button class="btn btn-sm btn-outline-warning lock-btn" data-id="${user.id}" data-action="lock" aria-label="Verrouiller l'utilisateur"><i class="bi bi-lock"></i></button>`;
+
+        const newRowHtml = `
+            <td>${user.last_name} ${user.first_name}</td>
+            <td>${user.email}</td>
+            <td><span class="badge ${getRoleBadge(user.role)}">${user.get_role_display}</span></td>
+            <td class="text-center">
+                <button class="btn btn-sm btn-outline-secondary edit-btn" data-id="${user.id}" aria-label="Modifier l'utilisateur"><i class="bi bi-pencil"></i></button>
+                <button class="btn btn-sm btn-outline-danger delete-btn" data-id="${user.id}" aria-label="Supprimer l'utilisateur"><i class="bi bi-trash"></i></button>
+                ${lockButtonHtml}
+            </td>
+        `;
+        if (row) {
+            row.innerHTML = newRowHtml;
+        } else {
+            row = document.createElement('tr');
+            row.id = `user-row-${user.id}`;
+            row.innerHTML = newRowHtml;
+            userTableBody.appendChild(row);
+        }
+    }
+
+    roleSelect.addEventListener('change', toggleSpecificFields);
+
+    addUserBtn.addEventListener('click', function () {
+        currentUserId = null;
+        userForm.reset();
+        document.getElementById('userModalLabel').textContent = 'Ajouter un utilisateur';
+        document.getElementById('form-errors').classList.add('d-none');
+        toggleSpecificFields();
+        userModal.show();
+    });
+
+    userTableBody.addEventListener('click', function (e) {
+        const target = e.target.closest('button');
+        if (target && target.classList.contains('edit-btn')) {
+            currentUserId = target.dataset.id;
+            fetch(`/administration/api/users/${currentUserId}/`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        return;
+                    }
+                    userForm.reset();
+                    document.getElementById('userModalLabel').textContent = 'Modifier un utilisateur';
+                    document.getElementById('form-errors').classList.add('d-none');
+                    
+                    document.getElementById('userId').value = data.id;
+                    document.getElementById('username').value = data.username;
+                    document.getElementById('email').value = data.email;
+                    document.getElementById('first_name').value = data.first_name;
+                    document.getElementById('last_name').value = data.last_name;
+                    document.getElementById('role').value = data.role;
+                    document.getElementById('matricule').value = data.matricule || '';
+                    document.getElementById('specialite').value = data.specialite || '';
+                    
+                    toggleSpecificFields();
+                    userModal.show();
+                });
+        }
+        if (target && target.classList.contains('delete-btn')) {
+            currentUserId = target.dataset.id;
+            deleteModal.show();
+        }
+    });
+
+    saveUserBtn.addEventListener('click', function () {
+        if (!userForm.checkValidity()) {
+            userForm.reportValidity();
+            return;
+        }
+
+        const spinner = saveUserBtn.querySelector('.spinner-border');
+        spinner.classList.remove('d-none');
+        saveUserBtn.disabled = true;
+
+        const formData = new FormData(userForm);
+        const url = currentUserId ? `/administration/api/users/${currentUserId}/update/` : '/administration/api/users/create/';
+        
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': csrftoken
+            },
+            body: formData
+        })
+        .then(response => response.json())
+        .then(result => {
+            if (result.status === 'success') {
+                userModal.hide();
+                upsertUserInTable(result.user);
+                showToast(result.message, 'success');
+            } else {
+                const errorDiv = document.getElementById('form-errors');
+                errorDiv.innerHTML = Object.values(result.errors).map(e => `<p>${e}</p>`).join('');
+                errorDiv.classList.remove('d-none');
+                showToast(result.message, 'error');
+            }
+        })
+        .finally(() => {
+            spinner.classList.add('d-none');
+            saveUserBtn.disabled = false;
+        });
+    });
+
+    document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
+        const spinner = this.querySelector('.spinner-border');
+        spinner.classList.remove('d-none');
+        this.disabled = true;
+
+        fetch(`/administration/api/users/${currentUserId}/delete/`, {
+            method: 'POST',
+            headers: { 'X-CSRFToken': csrftoken }
+        })
+        .then(response => response.json())
+        .then(result => {
+            if (result.status === 'success') {
+                document.getElementById(`user-row-${currentUserId}`).remove();
+                deleteModal.hide();
+                showToast(result.message, 'success');
+            } else {
+                showToast(result.message, 'error');
+            }
+        })
+        .finally(() => {
+            spinner.classList.add('d-none');
+            this.disabled = false;
+        });
+    });
+
+    userTableBody.addEventListener('click', function (e) {
+        const target = e.target.closest('button');
+        if (target && target.classList.contains('lock-btn')) {
+            const userId = target.dataset.id;
+            const action = target.dataset.action;
+            target.disabled = true; // Prevent double-clicks
+
+            fetch(`/administration/api/users/${userId}/${action}/`, {
+                method: 'POST',
+                headers: { 'X-CSRFToken': csrftoken }
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.status === 'success') {
+                    const icon = target.querySelector('i');
+                    if (action === 'lock') {
+                        target.dataset.action = 'unlock';
+                        target.classList.remove('btn-outline-warning');
+                        target.classList.add('btn-outline-success');
+                        target.setAttribute('aria-label', "Déverrouiller l'utilisateur");
+                        icon.classList.remove('bi-lock');
+                        icon.classList.add('bi-unlock');
+                    } else { // action was 'unlock'
+                        target.dataset.action = 'lock';
+                        target.classList.remove('btn-outline-success');
+                        target.classList.add('btn-outline-warning');
+                        target.setAttribute('aria-label', "Verrouiller l'utilisateur");
+                        icon.classList.remove('bi-unlock');
+                        icon.classList.add('bi-lock');
+                    }
+                    showToast(result.message, 'success');
+                } else {
+                    showToast(result.message, 'error');
+                }
+            })
+            .finally(() => {
+                target.disabled = false;
+            });
+        }
+    });
+});
+</script>
+{% endblock %}
