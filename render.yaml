@@ -22,7 +22,7 @@ services:
         value: 3.12.0
 
   # Base de données PostgreSQL
-  - type: pserv
+  - type: psql
     name: eistc-db
     # Nom de la base de données
     databaseName: e_istc_db
