@@ -1,34 +1,23 @@
+databases:
+  - name: eistc-db
+    databaseName: e_istc_db
+    user: e_istc_user
+    plan: free
+    region: frankfurt
+
 services:
-  # Service Web Django
   - type: web
     name: e-istc-platform
-    # Le runtime de votre application
     runtime: python
-    # Région du serveur
-    region: frankfurt # ou oregon
-    # Commande pour construire votre application
+    region: frankfurt
     buildCommand: "./build.sh"
-    # Commande pour démarrer votre application
     startCommand: "gunicorn e_istc.wsgi"
-    # Variables d'environnement
     envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.0
+      - key: DJANGO_SECRET_KEY
+        generateValue: true
       - key: DATABASE_URL
         fromDatabase:
           name: eistc-db
           property: connectionString
-      - key: DJANGO_SECRET_KEY
-        generateValue: true # Render va générer une clé secrète sécurisée
-      - key: PYTHON_VERSION
-        value: 3.12.0
-
-  # Base de données PostgreSQL
-  - type: psql
-    name: eistc-db
-    # Nom de la base de données
-    databaseName: e_istc_db
-    # Nom d'utilisateur
-    user: e_istc_user
-    # Région de la base de données
-    region: frankfurt # Doit être la même que le service web pour une performance optimale
-    # Plan (free pour le test)
-    plan: free
