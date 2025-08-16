@@ -13,9 +13,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 from pathlib import Path
 
 import os
-import dj_database_url
 from dotenv import load_dotenv
-
 load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -176,7 +174,7 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 LOGIN_URL = 'users:login'
 LOGIN_REDIRECT_URL = '/'
-LOGOUT_REDIRECT_URL = 'users:login'
+LOGOUT_REDIRECT_URL = '/'
 
 # Email Configuration
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
@@ -192,28 +190,62 @@ EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'handlers': {
-        'file': {
-            'level': 'WARNING', # Enregistre les avertissements et les erreurs
-            'class': 'logging.FileHandler',
-            'filename': BASE_DIR / 'logs/django.log',
-            'formatter': 'verbose',
+    "version": 1,
+    "disable_existing_loggers": False, # Important pour ne pas désactiver les loggers par défaut
+    "formatters": {
+        "verbose": {
+            "format": "{levelname} {asctime} {module} {process:d} {thread:d} {message}",
+            "style": "{",
+        },
+        "simple": {
+            "format": "{levelname} {message}",
+            "style": "{",
         },
     },
-    'loggers': {
-        'django': {
-            'handlers': ['file'],
-            'level': 'WARNING',
-            'propagate': True,
+    "handlers": {
+        "console": { # Ce gestionnaire envoie les logs à la console (stdout/stderr)
+            "level": "INFO", # Niveau minimum des messages à afficher (DEBUG, INFO, WARNING, ERROR, CRITICAL)
+            "class": "logging.StreamHandler",
+            "formatter": "simple", # Utilise le format 'simple' défini ci-dessus
         },
+        # -- COMMENTEZ OU SUPPRIMEZ LE GESTIONNAIRE DE FICHIER SUIVANT --
+        # Ce bloc est ce qui causait le FileNotFoundError sur Render car
+        # il essayait d'écrire dans un répertoire non persistant ou non existant.
+        # "file": {
+        #     "level": "INFO",
+        #     "class": "logging.handlers.RotatingFileHandler",
+        #     "filename": os.path.join(BASE_DIR, 'logs', 'django.log'),
+        #     "maxBytes": 1024 * 1024 * 5,  # 5 MB
+        #     "backupCount": 5,
+        #     "formatter": "verbose",
+        # },
     },
-    'formatters': {
-        'verbose': {
-            'format': '{levelname} {asctime} {module} {message}',
-            'style': '{',
+    "loggers": {
+        "django": {
+            "handlers": ["console"], # Assurez-vous que le logger 'django' utilise le gestionnaire 'console'
+            "level": "INFO",
+            "propagate": False, # N'envoie pas les logs aux loggers parents
         },
+        "django.request": {
+            "handlers": ["console"],
+            "level": "ERROR", # Les erreurs de requête sont importantes, affichez-les
+            "propagate": False,
+        },
+        # Vous pouvez ajouter d'autres loggers si nécessaire, par exemple pour vos propres applications
+        # 'yourappname': {
+        #     'handlers': ['console'],
+        #     'level': 'INFO',
+        #     'propagate': True,
+        # },
+    },
+    "root": { # Configuration du logger racine
+        "handlers": ["console"],
+        "level": "INFO", # Niveau par défaut pour tous les messages non traités par des loggers spécifiques
     },
 }
 
+# Assurez-vous que DEBUG est sur False en production pour des raisons de sécurité et de performance.
+# Vous pouvez le gérer avec une variable d'environnement comme dans votre render.yaml
+DEBUG = os.environ.get('DEBUG', 'False').lower() == 'true'
+ALLOWED_HOSTS = ['https://e-istc.onrender.com', 'localhost', '127.0.0.1']
+# ... (le reste de vos settings) ...

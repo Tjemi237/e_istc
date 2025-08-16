@@ -11,7 +11,7 @@ services:
     runtime: python
     region: frankfurt
     buildCommand: "./build.sh"
-    startCommand: "gunicorn e_istc.wsgi"
+    startCommand: "gunicorn e_istc.wsgi:application"
     envVars:
       - key: PYTHON_VERSION
         value: 3.12.0
